@@ -1,32 +1,34 @@
-INTRODUCTION
-------------
+[![Build Status](https://travis-ci.org/haringsrob/icecat.svg?branch=master)](https://travis-ci.org/haringsrob/icecat)
 
- * REQUIREMENTS
- * INSTALLATION
- * USAGE
+## INTRODUCTION
+* REQUIREMENTS
+* INSTALLATION
+* USAGE
 
-REQUIREMENTS
-------------
-
+## REQUIREMENTS
 This class requires php 5.3.
 
-INSTALLATION
-------------
-
+## INSTALLATION
 Add the file to your system using an autoloader.
 Or you can include the file like:
 
+```
 require_once '/classesIcecat/Icecat.php';
+```
 
-Then you ened to Use it.
+Then you need to Use it.
+
+```
 use Icecat\Icecat;
+```
 
-USAGE
------
+## USAGE
+
 To use it, please look at the Icecat.php file.
 
 Basic guidance:
 
+```
 // HERE ICECAT STARTS TO WORK.
 // Start the class
 $icecat = new Icecat\Icecat();
@@ -55,3 +57,8 @@ if ($icecat->hasErrors()) {
   // Continue to work with data.
   $producttitle = $icecat->getAttribute('Title');
 }
+
+```
+
+# Notice
+This documentation is not up to date, feel free to open a pullrequest with your improvements.
