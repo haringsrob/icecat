@@ -17,7 +17,8 @@ class IcecatTests extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
         // Load our dummy content.
-        $this->xml = simplexml_load_file('https://raw.githubusercontent.com/haringsrob/icecat/master/tests/DummyData/product.xml');
+        $path = dirname(__FILE__);
+        $this->xml = simplexml_load_string(file_get_contents($path . '/DummyData/product.xml'));
     }
 
     /**
@@ -26,8 +27,15 @@ class IcecatTests extends \PHPUnit_Framework_TestCase
      * @covers: ::setProductSku.
      * @covers: ::setLanguage.
      * @covers: ::getUrls.
+     * @covers: ::getAttribute.
+     * @covers: ::getSupplier.
+     * @covers: ::getLongDescription.
+     * @covers: ::getShortDescription.
+     * @covers: ::getCategory.
+     * @covers: ::getImages.
+     * @covers: ::getSpecs.
      */
-    public function testConfig()
+    public function testIcecat()
     {
         $icecat = new Icecat();
 
@@ -58,6 +66,38 @@ class IcecatTests extends \PHPUnit_Framework_TestCase
         // Simulates the getBaseData.
         $icecat->setBaseData($this->xml);
 
-        $var = 'foo';
+        // Get the attributes.
+        $info_title = $icecat->getAttribute('Title');
+        $this->assertEquals('Acer Chromebook C740-C3P1', $info_title);
+
+        // Test the supplier.
+        $info_supplier = $icecat->getSupplier();
+        $this->assertEquals('Acer', $info_supplier);
+
+        // Test description fields.
+        $short_description = $icecat->getShortDescription();
+        $this->assertContains('Intel Celeron 3205U 1.50 GHz, 2 GB DDR3L SDRAM', $short_description);
+
+        $long_description = $icecat->getLongDescription();
+        $this->assertContains('Engineered to be strong', $long_description);
+
+        // Test category.
+        $info_category = $icecat->getCategory();
+        $this->assertEquals('notebooks', $info_category);
+
+        // Test images.
+        $images = $icecat->getImages();
+        $this->assertTrue(count($images) > 0);
+
+        // Check if we actually get an image url.
+        $this->assertEquals('http://images.icecat.biz/img/norm/high/26057953-3839.jpg', $images[0]['high']);
+
+        // Test specifications.
+        $specifications = $icecat->getSpecs();
+        $this->assertTrue(count($specifications) > 0);
+
+        // Check if we actually hava specifications data.
+        $this->assertEquals($specifications[0]['name'], 'Product type');
+        $this->assertEquals($specifications[0]['data'], 'Chromebook');
     }
 }
