@@ -13,6 +13,34 @@ use haringsrob\Icecat\Model\IcecatFetcherInterface;
 class IcecatFetcher extends Icecat implements IcecatFetcherInterface
 {
     /**
+     * The ean number of the product.
+     *
+     * @var integer
+     */
+    public $ean;
+
+    /**
+     * The sku (product number) of the product.
+     *
+     * @var string
+     */
+    public $sku;
+
+    /**
+     * The brand of the product.
+     *
+     * @var string
+     */
+    public $brand;
+
+    /**
+     * The Language of the data we would like to get.
+     *
+     * @var string
+     */
+    public $language;
+
+    /**
      * The address of the server to fetch data from.
      *
      * @var string
@@ -52,6 +80,44 @@ class IcecatFetcher extends Icecat implements IcecatFetcherInterface
         $this->password = $password;
         $this->ean = $ean;
         $this->language = $language;
+    }
+
+    /**
+     * Sets the language to download data in.
+     */
+    public function setLanguage($language)
+    {
+        $this->language = $language;
+    }
+
+    /**
+     * Sets the product ean.
+     *
+     * @param $ean
+     */
+    public function setProductEan($ean)
+    {
+        $this->ean = $ean;
+    }
+
+    /**
+     * Sets the product sku.
+     *
+     * @param $sku
+     */
+    public function setProductSku($sku)
+    {
+        $this->sku = $sku;
+    }
+
+    /**
+     * Sets the product brand.
+     *
+     * @param $brand
+     */
+    public function setProductBrand($brand)
+    {
+        $this->brand = $brand;
     }
 
     /**
@@ -105,7 +171,7 @@ class IcecatFetcher extends Icecat implements IcecatFetcherInterface
      *
      * @return SimpleXML Object|bool
      */
-    public function getBaseData()
+    public function fetchBaseData()
     {
         // Our base return.
         $return = false;

@@ -26,10 +26,5 @@ interface IcecatFetcherInterface extends IcecatInterface
      *
      * @return SimpleXml Object
      */
-    public function getBaseData();
-
-    /**
-     * Sets the language.
-     */
-    public function setLanguage($language);
+    public function fetchBaseData();
 }

@@ -5,34 +5,6 @@ namespace haringsrob\Icecat\Model;
 class Icecat implements IcecatInterface
 {
     /**
-     * The Language of the data we would like to get.
-     *
-     * @var string
-     */
-    public $language;
-
-    /**
-     * The ean number of the product.
-     *
-     * @var integer
-     */
-    public $ean;
-
-    /**
-     * The sku (product number) of the product.
-     *
-     * @var string
-     */
-    public $sku;
-
-    /**
-     * The brand of the product.
-     *
-     * @var string
-     */
-    public $brand;
-
-    /**
      * The actual data we fetched. To get the data you can use @see haringsrob\Icecat\Controller\IcecatFetcher
      *
      * @var object
@@ -40,54 +12,19 @@ class Icecat implements IcecatInterface
     public $icecat_data;
 
     /**
-     * Sets the language to download data in.
-     */
-    public function setLanguage($language)
-    {
-        $this->language = $language;
-    }
-
-    /**
-     * Sets the product ean.
-     *
-     * @param $ean
-     */
-    public function setProductEan($ean)
-    {
-        $this->ean = $ean;
-    }
-
-    /**
-     * Sets the product sku.
-     *
-     * @param $sku
-     */
-    public function setProductSku($sku)
-    {
-        $this->sku = $sku;
-    }
-
-    /**
-     * Sets the product brand.
-     *
-     * @param $brand
-     */
-    public function setProductBrand($brand)
-    {
-        $this->brand = $brand;
-    }
-
-    /**
-     * @param SimpleXMLElement $xml
-     *    The SimpleXMLElement object to be used.
+     * @inheritdoc
      */
     public function setBaseData($xml)
     {
-        if (is_object($xml)) {
-            $this->icecat_data = $xml;
-        } else {
-            return false;
-        }
+        $this->icecat_data = $xml;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getBaseData()
+    {
+        return $this->icecat_data;
     }
 
     /**
@@ -95,57 +32,70 @@ class Icecat implements IcecatInterface
      */
     public function getAttributes()
     {
-        return $this->icecat_data->Product->attributes();
+        return $this->getProductData()->attributes();
     }
 
     /**
      * Returns a specific attribute.
+     *
+     * @param string $attribute
+     * @return string
      */
     public function getAttribute($attribute)
     {
-        return $this->icecat_data->Product->attributes()->$attribute->__toString();
+        return $this->getAttributes()->$attribute->__toString();
     }
 
     /**
      * Returns the supplier.
+     *
+     * @return string
      */
     public function getSupplier()
     {
-        return $this->icecat_data->Product->Supplier->attributes()->Name->__toString();
+        return $this->getProductData()->Supplier->attributes()->Name->__toString();
     }
 
     /**
      * Returns product long description.
+     *
+     * @return string
      */
     public function getLongDescription()
     {
-        if (is_object($this->icecat_data->Product->ProductDescription->attributes()->LongDesc)) {
-            return $this->icecat_data->Product->ProductDescription->attributes()->LongDesc->__toString();
+        if (is_object($this->getProductData()->ProductDescription->attributes()->LongDesc)) {
+            return $this->getProductData()->ProductDescription->attributes()->LongDesc->__toString();
         }
         return $this->getShortDescription();
     }
 
     /**
      * Returns product short description.
+     *
+     * @return string
      */
     public function getShortDescription()
     {
-        if (is_object($this->icecat_data->Product->ProductDescription->attributes()->ShortDesc)) {
-            return $this->icecat_data->Product->ProductDescription->attributes()->ShortDesc->__toString();
+        if (is_object($this->getProductData()->ProductDescription->attributes()->ShortDesc)) {
+            return $this->getProductData()->ProductDescription->attributes()->ShortDesc->__toString();
         }
         return false;
     }
 
     /**
      * Gets the product category.
+     *
+     * @return string
      */
     public function getCategory()
     {
-        return $this->icecat_data->Product->Category->Name->attributes()->Value->__toString();
+        return $this->getProductData()->Category->Name->attributes()->Value->__toString();
     }
 
     /**
      * Returns an array of images.
+     *
+     * @return array
      */
     public function getImages($limit = 0)
     {
@@ -159,8 +109,8 @@ class Icecat implements IcecatInterface
         // Loop our data.
         // Here we check if the gallery is available.
         // If not we just take the main image only.
-        if (!empty($this->icecat_data->Product->ProductGallery)) {
-            foreach ($this->icecat_data->Product->ProductGallery->ProductPicture as $img) {
+        if (!empty($this->getProductData()->ProductGallery)) {
+            foreach ($this->getProductData()->ProductGallery->ProductPicture as $img) {
 
                 $attr = $img->attributes();
                 $images[$imgcount - 1]['high'] = $attr->Pic->__toString();
@@ -177,16 +127,21 @@ class Icecat implements IcecatInterface
             }
         } else {
             // So our base did not have images. Lets try and fetch the main image.
-            if (!empty($this->icecat_data->Product->attributes()->HighPic)) {
-                $images[$imgcount - 1]['high'] = $this->icecat_data->Product->attributes()->HighPic->__toString();
-                $images[$imgcount - 1]['low'] = $this->icecat_data->Product->attributes()->LowPic->__toString();
-                $images[$imgcount - 1]['thumb'] = $this->icecat_data->Product->attributes()->ThumbPic->__toString();
+            if (!empty($this->getProductData()->attributes()->HighPic)) {
+                $images[$imgcount - 1]['high'] = $this->getProductData()->attributes()->HighPic->__toString();
+                $images[$imgcount - 1]['low'] = $this->getProductData()->attributes()->LowPic->__toString();
+                $images[$imgcount - 1]['thumb'] = $this->getProductData()->attributes()->ThumbPic->__toString();
             }
         }
 
         return $images;
     }
 
+    /**
+     * Returns an array of specifications.
+     *
+     * @return array
+     */
     public function getSpecs()
     {
 
@@ -197,7 +152,7 @@ class Icecat implements IcecatInterface
         $speccount = 0;
 
         // Loop our data.
-        foreach ($this->icecat_data->Product->ProductFeature as $feature) {
+        foreach ($this->getProductData()->ProductFeature as $feature) {
             $spec[$speccount]['name'] = $feature->Feature->Name->attributes()->Value->__toString();
             $spec[$speccount]['data'] = $feature->attributes()->Presentation_Value->__toString();
 
@@ -210,10 +165,12 @@ class Icecat implements IcecatInterface
 
     /**
      * Returns all product data.
+     *
+     * @return object
      */
     public function getProductData()
     {
-        return $this->icecat_data->Product;
+        return $this->getBaseData()->Product;
     }
 
 }

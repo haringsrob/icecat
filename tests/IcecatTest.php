@@ -28,22 +28,6 @@ class IcecatTests extends IcecatTestBase
     {
         $icecat = new Icecat();
 
-        // Set the EAN code.
-        $icecat->setProductEan('0887899773884');
-        $this->assertEquals('0887899773884', $icecat->ean);
-
-        // Set the Brand?
-        $icecat->setProductBrand('Acer');
-        $this->assertEquals('Acer', $icecat->brand);
-
-        // Set the SKU.
-        $icecat->setProductSku('12.ABAAB.34');
-        $this->assertEquals('12.ABAAB.34', $icecat->sku);
-
-        // Set the language.
-        $icecat->setLanguage('en');
-        $this->assertEquals('en', $icecat->language);
-
         // Simulates the getBaseData.
         $icecat->setBaseData($this->getSampleData());
 
