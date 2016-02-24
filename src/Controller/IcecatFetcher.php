@@ -42,6 +42,16 @@ class IcecatFetcher extends Icecat
     }
 
     /**
+     * Gets the username.
+     *
+     * @return string $username
+     */
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    /**
      * Sets the password to be used in the fetching process.
      *
      * @param string $password
@@ -52,13 +62,23 @@ class IcecatFetcher extends Icecat
     }
 
     /**
+     * Gets the password.
+     *
+     * @return string $password
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
      * Returns if there were any errors.
      *
      * @return array|bool
      */
     public function hasErrors()
     {
-        if (!$this->getBaseData()) {
+        if (is_array($this->errors)) {
             return $this->errors['error'];
         }
         return false;
@@ -69,7 +89,7 @@ class IcecatFetcher extends Icecat
      *
      * @return SimpleXML Object|bool
      */
-    private function getBaseData()
+    public function getBaseData()
     {
         // Our base return.
         $return = false;

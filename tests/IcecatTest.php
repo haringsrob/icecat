@@ -1,26 +1,15 @@
 <?php
 
-namespace haringsrob\Icecat\Test;
+namespace haringsrob\Icecat\Tests;
 
+use haringsrob\Icecat\Tests\IcecatTestBase;
 use haringsrob\Icecat\Model\Icecat;
 
 /**
- * @coversDefaultClass \haringsrob\Icecat\Icecat
+ * @coversDefaultClass \haringsrob\Icecat\Model\Icecat
  */
-class IcecatTests extends \PHPUnit_Framework_TestCase
+class IcecatTests extends IcecatTestBase
 {
-
-    private $icecat;
-    private $xml;
-
-    public function setUp()
-    {
-        parent::setUp();
-        // Load our dummy content.
-        $path = dirname(__FILE__);
-        $this->xml = simplexml_load_string(file_get_contents($path . '/DummyData/product.xml'));
-    }
-
     /**
      * @covers: ::setProductEan.
      * @covers: ::setProductBrand.
@@ -58,13 +47,13 @@ class IcecatTests extends \PHPUnit_Framework_TestCase
         // Tests getUrls.
         $url = $icecat->getUrls();
         // First should contain the EAN.
-        $this->assertContains($icecat->ean , $url[0]);
+        $this->assertContains($icecat->ean, $url[0]);
         // Second one should contain the brand and sku.
-        $this->assertContains($icecat->brand , $url[1]);
-        $this->assertContains($icecat->sku , $url[1]);
+        $this->assertContains($icecat->brand, $url[1]);
+        $this->assertContains($icecat->sku, $url[1]);
 
         // Simulates the getBaseData.
-        $icecat->setBaseData($this->xml);
+        $icecat->setBaseData($this->getSampleData());
 
         // Get the attributes.
         $info_title = $icecat->getAttribute('Title');
