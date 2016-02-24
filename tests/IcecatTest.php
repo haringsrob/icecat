@@ -2,7 +2,7 @@
 
 namespace haringsrob\Icecat\Test;
 
-use haringsrob\Icecat\Icecat;
+use haringsrob\Icecat\Model\Icecat;
 
 /**
  * @coversDefaultClass \haringsrob\Icecat\Icecat

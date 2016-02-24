@@ -1,49 +1,51 @@
 <?php
-/**
- * @file
- * Icecat Class.
- *
- * Author: Harings Rob
- * Homepage: http://harings.be
- * version: 0.1
- *
- * Icecat datagrabber communications class
- */
 
-namespace haringsrob\Icecat;
+namespace haringsrob\Icecat\Model;
 
 class Icecat
 {
 
-    /*
-     * Our custom variables.
+    /**
+     * The address of the server to fetch data from.
+     *
+     * @var string
      */
-    private $username;
-    private $password;
     private $serveradres = 'http://data.icecat.biz/xml_s3/xml_server3.cgi';
-    public $language;
-
-    /*
-     * Our icecat variables.
-     */
-    public $ean;
-    public $sku;
-    public $brand;
-
-    /*
-     * Store our productinfo.
-     */
-    public $icecat_data;
-    public $errors;
 
     /**
-     * Set our config data.
+     * The Language of the data we would like to get.
+     *
+     * @var string
      */
-    public function setConfig($username, $password)
-    {
-        $this->username = $username;
-        $this->password = $password;
-    }
+    public $language;
+
+    /**
+     * The ean number of the product.
+     *
+     * @var integer
+     */
+    public $ean;
+
+    /**
+     * The sku (product number) of the product.
+     *
+     * @var string
+     */
+    public $sku;
+
+    /**
+     * The brand of the product.
+     *
+     * @var string
+     */
+    public $brand;
+
+    /**
+     * The actual data we fetched. To get the data you can use @see haringsrob\Icecat\Controller\IcecatFetcher
+     *
+     * @var object
+     */
+    public $icecat_data;
 
     /**
      * Sets the language to download data in.
@@ -83,17 +85,6 @@ class Icecat
         $this->brand = $brand;
     }
 
-    /*
-     * Return the error if there is one. false if none.
-     */
-    public function hasErrors()
-    {
-        if (!$this->getBaseData()) {
-            return $this->errors['error'];
-        }
-        return false;
-    }
-
     /**
      * @param SimpleXMLElement $xml
      *    The SimpleXMLElement object to be used.
@@ -102,57 +93,9 @@ class Icecat
     {
         if (is_object($xml)) {
             $this->icecat_data = $xml;
-        }
-        else
-        {
+        } else {
             return false;
         }
-    }
-
-    /**
-     * Downloads the xml if available, Error array when no data is available.
-     */
-    private function getBaseData()
-    {
-        // Our base return.
-        $return = false;
-        // Loop all our urls, if we get a result, return it.
-        foreach ($this->getUrls() as $url) {
-            $options = array(
-                'http' => array(
-                    'header' => "Authorization: Basic " . base64_encode($this->username . ":" . $this->password),
-                ),
-            );
-            $context = stream_context_create($options);
-            $data = file_get_contents($url, false, $context);
-            $xml = simplexml_load_string($data);
-            // Check for errors.
-            if (!empty($xml->Product['ErrorMessage'])) {
-                $this->errors['error'] = array(
-                    'message' => $xml->Product['ErrorMessage']->__toString(),
-                    'code' => $xml->Product['Code']->__toString(),
-                    'type' => 'error',
-                );
-                return false;
-            } elseif ($xml && !empty($xml)) {
-                $this->icecat_data = $xml;
-                return true;
-            } else {
-                $this->errors['error'] = array(
-                    'message' => 'Empty response.',
-                    'code' => 2,
-                    'type' => 'error',
-                );
-                return false;
-            }
-        }
-        // No loop, no data.
-        $this->errors['error'] = array(
-            'message' => 'No valid urls.',
-            'code' => 2,
-            'type' => 'error',
-        );
-        return false;
     }
 
     /**
