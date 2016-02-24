@@ -2,16 +2,8 @@
 
 namespace haringsrob\Icecat\Model;
 
-class Icecat
+class Icecat implements IcecatInterface
 {
-
-    /**
-     * The address of the server to fetch data from.
-     *
-     * @var string
-     */
-    private $serveradres = 'http://data.icecat.biz/xml_s3/xml_server3.cgi';
-
     /**
      * The Language of the data we would like to get.
      *
@@ -96,29 +88,6 @@ class Icecat
         } else {
             return false;
         }
-    }
-
-    /**
-     * Gets the possible data urls, we have to check them after.
-     */
-    public function getUrls()
-    {
-        $checkurls = array();
-        if (!empty($this->ean)) {
-            $checkurls[] = $this->serveradres .
-                '?ean_upc=' . urlencode($this->ean) .
-                ';lang=' . $this->language . ';output=productxml;';
-        }
-        if (!empty($this->sku) && !empty($this->brand)) {
-            $checkurls[] = $this->serveradres .
-                '?prod_id=' . urlencode($this->sku) . ';lang=' . $this->language .
-                ';output=productxml;vendor=' . $this->brand . ';';
-        } elseif (!empty($this->sku)) {
-            $checkurls[] = $this->serveradres . '?ean_upc=' .
-                urlencode($this->sku) . ';lang=' . $this->language .
-                ';output=productxml';
-        }
-        return $checkurls;
     }
 
     /**

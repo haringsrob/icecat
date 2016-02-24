@@ -1,16 +1,24 @@
 <?php
 
-namespace haringsrob\Icecat\Controller;
+namespace haringsrob\Icecat\Model;
 
 use haringsrob\Icecat\Model\Icecat;
+use haringsrob\Icecat\Model\IcecatFetcherInterface;
 
 /**
  * Class IcecatFetcher
  *
  * This class acts as a communication helper to fetch data from icecat.
  */
-class IcecatFetcher extends Icecat
+class IcecatFetcher extends Icecat implements IcecatFetcherInterface
 {
+    /**
+     * The address of the server to fetch data from.
+     *
+     * @var string
+     */
+    public $serveradres = 'http://data.icecat.biz/xml_s3/xml_server3.cgi';
+
     /**
      * The icecat username.
      *
@@ -32,43 +40,51 @@ class IcecatFetcher extends Icecat
     public $errors;
 
     /**
-     * Sets the username to be used in the fetching process.
-     *
-     * @param string $username
+     * IcecatFetcher constructor.
+     * @param $username
+     * @param $password
+     * @param $ean
+     * @param $language
      */
-    public function setUsername($username)
+    public function __construct($username, $password, $ean, $language)
     {
         $this->username = $username;
-    }
-
-    /**
-     * Gets the username.
-     *
-     * @return string $username
-     */
-    public function getUsername()
-    {
-        return $this->username;
-    }
-
-    /**
-     * Sets the password to be used in the fetching process.
-     *
-     * @param string $password
-     */
-    public function setPassword($password)
-    {
         $this->password = $password;
+        $this->ean = $ean;
+        $this->language = $language;
     }
 
     /**
-     * Gets the password.
-     *
-     * @return string $password
+     * @inheritdoc.
      */
-    public function getPassword()
+    public function getServerAddress()
     {
-        return $this->password;
+        return $this->serveradres;
+    }
+
+    /**
+     * Constructs a list of possible url's to fetch data from.
+     *
+     * @return array
+     */
+    public function getUrls()
+    {
+        $checkurls = array();
+        if (!empty($this->ean)) {
+            $checkurls[] = $this->getServerAddress() .
+                '?ean_upc=' . urlencode($this->ean) .
+                ';lang=' . $this->language . ';output=productxml;';
+        }
+        if (!empty($this->sku) && !empty($this->brand)) {
+            $checkurls[] = $this->getServerAddress() .
+                '?prod_id=' . urlencode($this->sku) . ';lang=' . $this->language .
+                ';output=productxml;vendor=' . $this->brand . ';';
+        } elseif (!empty($this->sku)) {
+            $checkurls[] = $this->getServerAddress() . '?ean_upc=' .
+                urlencode($this->sku) . ';lang=' . $this->language .
+                ';output=productxml';
+        }
+        return $checkurls;
     }
 
     /**

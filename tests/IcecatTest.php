@@ -44,14 +44,6 @@ class IcecatTests extends IcecatTestBase
         $icecat->setLanguage('en');
         $this->assertEquals('en', $icecat->language);
 
-        // Tests getUrls.
-        $url = $icecat->getUrls();
-        // First should contain the EAN.
-        $this->assertContains($icecat->ean, $url[0]);
-        // Second one should contain the brand and sku.
-        $this->assertContains($icecat->brand, $url[1]);
-        $this->assertContains($icecat->sku, $url[1]);
-
         // Simulates the getBaseData.
         $icecat->setBaseData($this->getSampleData());
 

@@ -2,7 +2,7 @@
 
 namespace haringsrob\Icecat\Tests;
 
-use haringsrob\Icecat\Controller\IcecatFetcher;
+use haringsrob\Icecat\Model\IcecatFetcher;
 
 /**
  * @coversDefaultClass \haringsrob\Icecat\Model\IcecatFetcher
@@ -21,14 +21,20 @@ class IcecatFetcherTests extends IcecatTestBase
      */
     public function testFetcherConfig()
     {
-        $icecat = new IcecatFetcher();
+        $icecat = new IcecatFetcher(
+            'Bar',
+            'Foo',
+            '01234567891987',
+            'EN'
+        );
 
-        $icecat->setUsername('Bar');
-        $this->assertEquals('Bar', $icecat->getUsername());
+        // Tests getUrls.
+        $url = $icecat->getUrls();
 
-        $icecat->setPassword('Foo');
-        $this->assertEquals('Foo', $icecat->getPassword());
+        // First should contain the EAN.
+        $this->assertContains($icecat->ean, $url[0]);
 
+        // Set base data.
         $icecat->setBaseData($this->getSampleData());
 
         // Test: getAttribute.
