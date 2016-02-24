@@ -7,7 +7,7 @@ use haringsrob\Icecat\Model\Icecat;
 /**
  * The base test class, which creates testable dummy content.
  */
-class IcecatTestBase extends \PHPUnit_Framework_TestCase
+abstract class IcecatTestBase extends \PHPUnit_Framework_TestCase
 {
     /**
      * Example icecat data.
