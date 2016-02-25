@@ -44,12 +44,12 @@ class IcecatFetcherTests extends IcecatTestBase
     /**
      * Tests the config methods of the icecatFetcher.
      *
-     * @covers ::hasErrors
      * @covers ::setProductEan
      * @covers ::setProductBrand
      * @covers ::setProductSku
      * @covers ::setLanguage
      * @covers ::getBaseData
+     * @covers ::getErrors
      */
     public function testFetcherConfig()
     {
@@ -95,9 +95,9 @@ class IcecatFetcherTests extends IcecatTestBase
         // Attempt to get the data, but this should fail.
         $this->assertFalse($icecat->fetchBaseData());
         $fetc = $icecat->fetchBaseData();
-        
+
         // And as we have errors, we can check the hasErrors here.
-        $this->assertTrue(!empty($icecat->getErrors()));
+        $this->assertNotFalse($icecat->getErrors());
 
     }
 }
