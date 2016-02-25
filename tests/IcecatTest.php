@@ -11,18 +11,20 @@ use haringsrob\Icecat\Model\Icecat;
 class IcecatTests extends IcecatTestBase
 {
     /**
-     * @covers: ::setProductEan.
-     * @covers: ::setProductBrand.
-     * @covers: ::setProductSku.
-     * @covers: ::setLanguage.
-     * @covers: ::getUrls.
-     * @covers: ::getAttribute.
-     * @covers: ::getSupplier.
-     * @covers: ::getLongDescription.
-     * @covers: ::getShortDescription.
-     * @covers: ::getCategory.
-     * @covers: ::getImages.
-     * @covers: ::getSpecs.
+     * @covers: ::setBaseData
+     * @covers: ::getBaseData
+     * @covers: ::setProductEan
+     * @covers: ::setProductBrand
+     * @covers: ::setProductSku
+     * @covers: ::setLanguage
+     * @covers: ::getUrls
+     * @covers: ::getAttribute
+     * @covers: ::getSupplier
+     * @covers: ::getLongDescription
+     * @covers: ::getShortDescription
+     * @covers: ::getCategory
+     * @covers: ::getImages
+     * @covers: ::getSpecs
      */
     public function testIcecat()
     {
@@ -30,6 +32,9 @@ class IcecatTests extends IcecatTestBase
 
         // Simulates the getBaseData.
         $icecat->setBaseData($this->getSampleData());
+
+        // getBaseData.
+        $this->assertEquals($this->getSampleData(), $icecat->getBaseData());
 
         // Get the attributes.
         $info_title = $icecat->getAttribute('Title');
