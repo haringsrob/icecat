@@ -22,9 +22,39 @@ interface IcecatFetcherInterface extends IcecatInterface
     public function getUrls();
 
     /**
+     * Returns the Username required to connect with Icecat.
+     *
+     * @return string
+     */
+    public function getUsername();
+
+    /**
+     * Returns the Password required to connect with Icecat.
+     *
+     * @return string
+     */
+    public function getPassword();
+
+    /**
+     * Returns the Language required to connect with Icecat.
+     *
+     * @return string
+     */
+    public function getLanguage();
+
+    /**
      * Fetches and builds a SimpleXml Object from the response.
      *
      * @return SimpleXml Object
      */
     public function fetchBaseData();
+
+    /**
+     * Sets error messages.
+     *
+     * @param string $message
+     * @param string $code
+     * @param string $type
+     */
+    public function setError($message, $code, $type);
 }

@@ -10,6 +10,38 @@ use haringsrob\Icecat\Model\IcecatFetcher;
 class IcecatFetcherTests extends IcecatTestBase
 {
     /**
+     * Tests the interface.
+     *
+     * @covers ::getServerAddress
+     * @covers ::getUrls
+     * @covers ::getUsername
+     * @covers ::getPassword
+     * @covers ::getLanguage
+     * @covers ::fetchBaseData
+     */
+    public function testFetcherInterface()
+    {
+        $icecat = new IcecatFetcher(
+            'Bar',
+            'Foo',
+            '01234567891987',
+            'EN'
+        );
+
+        $this->assertEquals('http://data.icecat.biz/xml_s3/xml_server3.cgi', $icecat->getServerAddress());
+
+        $this->assertTrue(is_array($icecat->getUrls()));
+
+        $this->assertEquals('Bar', $icecat->getUsername());
+
+        $this->assertEquals('Foo', $icecat->getPassword());
+
+        $this->assertEquals('EN', $icecat->getLanguage());
+
+        $this->assertFalse($icecat->fetchBaseData());
+    }
+
+    /**
      * Tests the config methods of the icecatFetcher.
      *
      * @covers ::hasErrors
@@ -62,9 +94,10 @@ class IcecatFetcherTests extends IcecatTestBase
 
         // Attempt to get the data, but this should fail.
         $this->assertFalse($icecat->fetchBaseData());
-
+        $fetc = $icecat->fetchBaseData();
+        
         // And as we have errors, we can check the hasErrors here.
-        $this->assertArrayHasKey('message', $icecat->hasErrors());
+        $this->assertTrue(!empty($icecat->getErrors()));
 
     }
 }
