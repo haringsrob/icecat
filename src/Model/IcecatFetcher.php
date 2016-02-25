@@ -3,7 +3,6 @@
 namespace haringsrob\Icecat\Model;
 
 use haringsrob\Icecat\Model\Icecat;
-use haringsrob\Icecat\Model\IcecatFetcherInterface;
 
 /**
  * Class IcecatFetcher
@@ -67,7 +66,7 @@ class IcecatFetcher extends IcecatFetcherBase
      *
      * @param $ean
      */
-    public function setProductEan($ean)
+    public function setEan($ean)
     {
         $this->ean = $ean;
     }
@@ -77,7 +76,7 @@ class IcecatFetcher extends IcecatFetcherBase
      *
      * @param $sku
      */
-    public function setProductSku($sku)
+    public function setSku($sku)
     {
         $this->sku = $sku;
     }
@@ -87,7 +86,7 @@ class IcecatFetcher extends IcecatFetcherBase
      *
      * @param $brand
      */
-    public function setProductBrand($brand)
+    public function setBrand($brand)
     {
         $this->brand = $brand;
     }
@@ -99,7 +98,7 @@ class IcecatFetcher extends IcecatFetcherBase
      */
     public function getErrors()
     {
-        if (is_array($this->errors)) {
+        if (!empty($this->errors)) {
             return $this->errors;
         }
         return false;

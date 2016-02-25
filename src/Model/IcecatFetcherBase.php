@@ -7,7 +7,7 @@ namespace haringsrob\Icecat\Model;
  *
  * This the base class for IcecatFetcher, providing the minimum required logic.
  */
-abstract class IcecatFetcherBase extends Icecat implements IcecatFetcherInterface
+abstract class IcecatFetcherBase implements IcecatFetcherInterface
 {
     /**
      * The ean number of the product.
@@ -29,6 +29,20 @@ abstract class IcecatFetcherBase extends Icecat implements IcecatFetcherInterfac
      * @var array
      */
     public $errors = array();
+
+    /**
+     * The fetched data object.
+     *
+     * @var SimpleXML-object
+     */
+    public $icecat_data;
+
+    /**
+     * The list of urls we can parse.
+     *
+     * @var array
+     */
+    public $data_urls = array();
 
     /**
      * The address of the server to fetch data from.
@@ -70,16 +84,30 @@ abstract class IcecatFetcherBase extends Icecat implements IcecatFetcherInterfac
     }
 
     /**
+     * @inheritdoc.
+     */
+    public function getEan()
+    {
+        return $this->ean;
+    }
+
+    /**
      * Constructs a list of possible url's to fetch data from.
      *
      * @return array
      */
-    public function getUrls()
+    public function generateUrls()
     {
-        $checkurls = array();
-        if (!empty($this->ean)) {
+        // Init the array to return.
+        $checkurls = [];
+
+        // Get the EAN code.
+        $ean = $this->getEan();
+
+        // Structure the url. There might be more urls available.
+        if (!empty($ean)) {
             $checkurls[] = $this->getServerAddress() .
-                '?ean_upc=' . urlencode($this->ean) .
+                '?ean_upc=' . urlencode($ean) .
                 ';lang=' . $this->getLanguage() . ';output=productxml;';
         }
         if (!empty($this->sku) && !empty($this->brand)) {
@@ -91,8 +119,32 @@ abstract class IcecatFetcherBase extends Icecat implements IcecatFetcherInterfac
                 urlencode($this->sku) . ';lang=' . $this->getLanguage() .
                 ';output=productxml';
         }
-        return $checkurls;
+        $this->setUrls($checkurls);
     }
+
+    /**
+     * Sets the urls which will be used to fetch the data.
+     *
+     * @param $urls
+     */
+    public function setUrls($urls)
+    {
+        $this->data_urls = $urls;
+    }
+
+    /**
+     * Returns the available urls.
+     *
+     * @param $urls
+     */
+    public function getUrls()
+    {
+        if (empty($this->data_urls)) {
+            $this->generateUrls();
+        }
+        return $this->data_urls;
+    }
+
 
     /**
      * Connects with the server and reads out the data.
@@ -115,27 +167,38 @@ abstract class IcecatFetcherBase extends Icecat implements IcecatFetcherInterfac
             // @todo: Take a different approach.
             try {
                 $context = stream_context_create($options);
-                $data = @file_get_contents($url, false, $context);
+                $data = file_get_contents($url, false, $context);
                 $xml = simplexml_load_string($data);
             } catch (Exception $e) {
+                $this->setError('Error fetching data ' . $e, 3);
                 return false;
             }
 
             // Check for errors.
             if (!empty($xml->Product['ErrorMessage'])) {
                 $this->setError($xml->Product['ErrorMessage']->__toString(), $xml->Product['Code']->__toString());
-                return false;
             } elseif (is_object($xml)) {
                 $this->setBaseData($xml);
-                return true;
             } else {
                 $this->setError('Empty response.', 3);
-                return false;
             }
         }
-        // No loop, no data.
-        $this->setError('No valid urls.', 2);
-        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getBaseData()
+    {
+        return $this->icecat_data;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setBaseData($xml)
+    {
+        $this->icecat_data = $xml;
     }
 
     /**

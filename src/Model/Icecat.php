@@ -172,7 +172,4 @@ class Icecat implements IcecatInterface
     {
         return $this->getBaseData()->Product;
     }
-
 }
-
-

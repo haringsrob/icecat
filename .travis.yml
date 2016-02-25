@@ -11,4 +11,4 @@ install:
   - composer install
 
 script:
-  - ./vendor/bin/phpunit -c ./phpunit.xml --coverage-text --strict
+  - ./vendor/bin/phpunit -c ./phpunit.xml --coverage-text --strict --verbose

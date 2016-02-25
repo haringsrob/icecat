@@ -17,14 +17,31 @@ abstract class IcecatTestBase extends \PHPUnit_Framework_TestCase
     private $xml;
 
     /**
+     * Contains the path to the test data.
+     *
+     * @var string
+     */
+    private $test_path;
+
+    /**
      * @inheritdoc.
      */
     public function setUp()
     {
         parent::setUp();
         // Load our dummy content.
-        $path = dirname(__FILE__);
-        $this->xml = simplexml_load_string(file_get_contents($path . '/DummyData/product.xml'));
+        $this->test_path = dirname(__FILE__);
+        $this->xml = simplexml_load_string(file_get_contents($this->test_path . '/DummyData/product.xml'));
+    }
+
+    /**
+     * Returns a "url" to the Mock.
+     *
+     * @return array
+     */
+    public function getLocalUrls()
+    {
+        return [$this->test_path . '/DummyData/product.xml'];
     }
 
     /**
@@ -36,5 +53,4 @@ abstract class IcecatTestBase extends \PHPUnit_Framework_TestCase
     {
         return $this->xml;
     }
-
 }

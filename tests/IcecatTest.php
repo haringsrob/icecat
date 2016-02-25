@@ -17,7 +17,7 @@ class IcecatTests extends IcecatTestBase
      * @covers: ::setProductBrand
      * @covers: ::setProductSku
      * @covers: ::setLanguage
-     * @covers: ::getUrls
+     * @covers: ::generateUrls
      * @covers: ::getAttribute
      * @covers: ::getSupplier
      * @covers: ::getLongDescription

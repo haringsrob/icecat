@@ -19,7 +19,7 @@ interface IcecatFetcherInterface extends IcecatInterface
      *
      * @return array
      */
-    public function getUrls();
+    public function generateUrls();
 
     /**
      * Returns the Username required to connect with Icecat.
@@ -41,6 +41,13 @@ interface IcecatFetcherInterface extends IcecatInterface
      * @return string
      */
     public function getLanguage();
+
+    /**
+     * Returns the defined EAN code.
+     *
+     * @return string
+     */
+    public function getEan();
 
     /**
      * Fetches and builds a SimpleXml Object from the response.
