@@ -11,6 +11,7 @@ use haringsrob\Icecat\Model\Icecat;
 class IcecatTests extends IcecatTestBase
 {
     /**
+     * @covers: ::__constructor
      * @covers: ::setBaseData
      * @covers: ::getBaseData
      * @covers: ::setProductEan
@@ -28,7 +29,7 @@ class IcecatTests extends IcecatTestBase
      */
     public function testIcecat()
     {
-        $icecat = new Icecat();
+        $icecat = new Icecat($this->getSampleData());
 
         // Simulates the getBaseData.
         $icecat->setBaseData($this->getSampleData());

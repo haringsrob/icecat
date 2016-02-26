@@ -11,12 +11,25 @@ class Icecat implements IcecatInterface
      */
     public $icecat_data;
 
+
+    /**
+     * Icecat Constructor.
+     *
+     * @todo: validation.
+     *
+     * @param SimpleXML-object $data
+     */
+    public function __construct($data)
+    {
+        $this->icecat_data = $data;
+    }
+
     /**
      * @inheritdoc
      */
-    public function setBaseData($xml)
+    public function setBaseData($data)
     {
-        $this->icecat_data = $xml;
+        $this->icecat_data = $data;
     }
 
     /**

@@ -1,64 +1,92 @@
+Icecat
+======
 [![Build Status](https://travis-ci.org/haringsrob/icecat.svg?branch=master)](https://travis-ci.org/haringsrob/icecat)
 
-## INTRODUCTION
-* REQUIREMENTS
-* INSTALLATION
-* USAGE
+Icecat is a PHP library, that assists you in the following 2 procedures:
+* Fetching data from the Icecat database using basic product information.
+* Parsing this data from the Icecat response, and using them in real life applications.
 
-## REQUIREMENTS
-This class requires php 5.3.
+### About Icecat
+[Icecat](http://icecat.biz, "Icecat") is an open catalog, providing free access to thousands of product datasheets.
+In extend, when taking a subscription, the amount of accessible datasheets are increased.
 
-## INSTALLATION
-Add the file to your system using an autoloader.
-Or you can include the file like:
+There is a list of [Icecat sponsor brands](http://icecat.co.uk/en/menu/partners/index.html, "Icecat sponsor brands").
 
-```
-require_once '/classesIcecat/Icecat.php';
-```
 
-Then you need to Use it.
+Installation
+============
 
-```
-use Icecat\Icecat;
-```
-
-## USAGE
-
-To use it, please look at the Icecat.php file.
-
-Basic guidance:
+The library can be installed in various ways. You could manually integrate it but the easiest way to get started is 
+through composer, adding the following to your project required would be enough.
 
 ```
-// HERE ICECAT STARTS TO WORK.
-// Start the class
-$icecat = new Icecat\Icecat();
+"haringsrob/icecat": "dev-master"
+```
 
-// Init our icecat config.
-$icecat->setConfig(
-  'icecat_username',
-  'icecat_password'
+Usage
+=====
+
+The class library is, in it's current state easy to be used.
+
+### Icecat
+
+The [Icecat class](https://github.com/haringsrob/icecat/blob/master/src/Model/Icecat.php) is responsible for parsing the data. It includes a few basic methods, but you can easily create your 
+own implementation by implementing the IcecatInterface interface.
+
+```php
+// Use the class.
+use haringsrob\Icecat\Model\Icecat;
+
+// See IcecatFetcher on how to get data or implement your own way.
+$data = $fetcher->getBaseData();
+
+// Initialize.
+$icecat = new Icecat($data);
+
+// Get data from the object.
+
+// Brand name. e.g.: Acer
+$icecat->getSupplier();
+
+// Long description of the product.
+$icecat->getLongDescription();
+
+// Short description.
+$icecat->getShortDescription();
+
+// The category the product belongs to. e.g.: Notebooks
+$icecat->getCategory();
+
+// Returns maximum 5 images about the product (optional limit).
+$icecat->getImages(5);
+
+// Returns key => value array with specifications. e.g: ['cpu' => 'Core I5', 'screensize' => '15.6']
+$icecat->getSpecs();
+```
+
+Demo is soon available.
+
+### IcecatFetcher
+
+The [IcecatFetcher](https://github.com/haringsrob/icecat/blob/master/src/Model/IcecatFetcher.php) is responsible for fetching the data from the database.
+
+```php
+// Use the class.
+use haringsrob\Icecat\Model\IcecatFetcher;
+
+// Inititialize.
+$fetcher = new IcecatFetcher(
+    'Username',
+    'Password',
+    'Ean',
+    'Language'
 );
 
-// Set the language.
-$icecat->setLanguage('icecat_language');
-
-// Set our product data.
-$icecat->setProductInfo(
-  'icecat_ean',
-  'icecat_sku',
-  'icecat_brand'
-);
-
-// If we have an error, we should stop.
-if ($icecat->hasErrors()) {
-  // Set our error session.
-  $errors = $icecat->hasErrors();
-} else {
-  // Continue to work with data.
-  $producttitle = $icecat->getAttribute('Title');
-}
-
+// Fetch the actual data.
+$data = $fetcher->fetchBaseData();
 ```
 
-# Notice
-This documentation is not up to date, feel free to open a pullrequest with your improvements.
+Integrations
+============
+
+[Drupal module](https://www.drupal.org/sandbox/tortelduif/2669832, "Icecat Drupal") under active development.
