@@ -27,20 +27,20 @@ Usage
 
 The class library is, in it's current state easy to be used.
 
-### Icecat
+### Result
 
 The [Icecat class](https://github.com/haringsrob/icecat/blob/master/src/Model/Icecat.php) is responsible for parsing the data. It includes a few basic methods, but you can easily create your 
 own implementation by implementing the IcecatInterface interface.
 
 ```php
 // Use the class.
-use haringsrob\Icecat\Model\Icecat;
+use haringsrob\Icecat\Model\Result;
 
 // See IcecatFetcher on how to get data or implement your own way.
 $data = $fetcher->getBaseData();
 
 // Initialize.
-$icecat = new Icecat($data);
+$icecat = new Result($data);
 
 // Get data from the object.
 
@@ -65,16 +65,16 @@ $icecat->getSpecs();
 
 Demo is soon available.
 
-### IcecatFetcher
+### Fetcher
 
 The [IcecatFetcher](https://github.com/haringsrob/icecat/blob/master/src/Model/IcecatFetcher.php) is responsible for fetching the data from the database.
 
 ```php
 // Use the class.
-use haringsrob\Icecat\Model\IcecatFetcher;
+use haringsrob\Icecat\Model\Fetcher;
 
 // Inititialize.
-$fetcher = new IcecatFetcher(
+$fetcher = new Fetcher(
     'Username',
     'Password',
     'Ean',

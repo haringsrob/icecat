@@ -2,6 +2,8 @@
 
 namespace haringsrob\Icecat\Model;
 
+use GuzzleHttp\Client;
+
 /**
  * Class FetcherBase
  *
@@ -49,7 +51,7 @@ abstract class FetcherBase implements FetcherInterface
      *
      * @var string
      */
-    protected $serveradres = 'http://data.icecat.biz/xml_s3/xml_server3.cgi';
+    protected $serveradres = 'https://data.icecat.biz';
 
     /**
      * @inheritdoc.
@@ -127,16 +129,18 @@ abstract class FetcherBase implements FetcherInterface
         // Structure the url. There might be more urls available.
         if (!empty($ean)) {
             $checkurls[] = $this->getServerAddress() .
-                '?ean_upc=' . urlencode($ean) .
+                '/xml_s3/xml_server3.cgi?ean_upc=' . urlencode($ean) .
                 ';lang=' . $this->getLanguage() . ';output=productxml;';
         }
-        if (!empty($this->sku) && !empty($this->brand)) {
+        if (!empty($this->getSku()) && !empty($this->getBrand())) {
             $checkurls[] = $this->getServerAddress() .
-                '?prod_id=' . urlencode($this->sku) . ';lang=' . $this->getLanguage() .
-                ';output=productxml;vendor=' . $this->brand . ';';
-        } elseif (!empty($this->sku)) {
-            $checkurls[] = $this->getServerAddress() . '?ean_upc=' .
-                urlencode($this->sku) . ';lang=' . $this->getLanguage() .
+                '/xml_s3/xml_server3.cgi?prod_id=' . urlencode($this->getSku()) .
+                ';lang=' . $this->getLanguage() .
+                ';output=productxml;vendor=' . $this->getBrand() . ';';
+        } elseif (!empty($this->getSku())) {
+            $checkurls[] = $this->getServerAddress() .
+                '/xml_s3/xml_server3.cgi?ean_upc=' .
+                urlencode($this->getSku()) . ';lang=' . $this->getLanguage() .
                 ';output=productxml';
         }
         $this->setUrls($checkurls);
@@ -173,34 +177,21 @@ abstract class FetcherBase implements FetcherInterface
      */
     public function fetchBaseData()
     {
-        $auth_string = "Authorization: Basic " . base64_encode($this->getUsername() . ":" . $this->getPassword());
-        // Our base return.
-        $return = false;
-        // Loop all our urls, if we get a result, return it.
         foreach ($this->getUrls() as $url) {
-            $options = array(
-                'http' => array(
-                    'header' => $auth_string,
-                ),
-            );
+            $client = new Client();
+            $response = $client->request('GET', $url, [
+                'verify' => true,
+                'auth' => [
+                    $this->getUsername(),
+                    $this->getPassword(),
+                ]
+            ]);
 
-            // @todo: Take a different approach.
-            try {
-                $context = stream_context_create($options);
-                $data = file_get_contents($url, false, $context);
-                $xml = simplexml_load_string($data);
-            } catch (Exception $e) {
-                $this->setError('Error fetching data ' . $e, 3);
-                return false;
-            }
-
-            // Check for errors.
-            if (!empty($xml->Product['ErrorMessage'])) {
-                $this->setError($xml->Product['ErrorMessage']->__toString(), $xml->Product['Code']->__toString());
-            } elseif (is_object($xml)) {
-                $this->setBaseData($xml);
+            if ($response->getStatusCode() == 200) {
+                $this->setBaseData($response->getBody()->getContents());
+                break;
             } else {
-                $this->setError('Empty response.', 3);
+                $this->setError($response->getReasonPhrase(), $response->getStatusCode());
             }
         }
     }

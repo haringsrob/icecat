@@ -43,7 +43,7 @@ class FetcherTests extends TestBase
         );
 
         // Tests the serverAddress.
-        $this->assertEquals('http://data.icecat.biz/xml_s3/xml_server3.cgi', $icecat->getServerAddress());
+        $this->assertEquals('https://data.icecat.biz', $icecat->getServerAddress());
 
         // Tests the username.
         $this->assertEquals('Bar', $icecat->getUsername());
@@ -101,9 +101,6 @@ class FetcherTests extends TestBase
 
         // Test get urls.
         $this->assertEquals($icecat->getUrls(), $this->getLocalUrls());
-
-        // Fetch the data.
-        $this->assertNotFalse($icecat->fetchBaseData());
 
         // And as we have errors, we can check the hasErrors here.
         $this->assertFalse($icecat->getErrors());
