@@ -126,22 +126,21 @@ abstract class FetcherBase implements FetcherInterface
         // Get the EAN code.
         $ean = $this->getEan();
 
+        // Prefix.
+        $prefix = $this->getServerAddress() . '/xml_s3/xml_server3.cgi';
+        $suffix = ';lang=' . $this->getLanguage() . ';output=productxml;';
+
         // Structure the url. There might be more urls available.
         if (!empty($ean)) {
-            $checkurls[] = $this->getServerAddress() .
-                '/xml_s3/xml_server3.cgi?ean_upc=' . urlencode($ean) .
-                ';lang=' . $this->getLanguage() . ';output=productxml;';
+            $checkurls[] =  $prefix .
+                '?ean_upc=' . urlencode($ean) .
+                $suffix;
         }
         if (!empty($this->getSku()) && !empty($this->getBrand())) {
-            $checkurls[] = $this->getServerAddress() .
-                '/xml_s3/xml_server3.cgi?prod_id=' . urlencode($this->getSku()) .
-                ';lang=' . $this->getLanguage() .
-                ';output=productxml;vendor=' . $this->getBrand() . ';';
-        } elseif (!empty($this->getSku())) {
-            $checkurls[] = $this->getServerAddress() .
-                '/xml_s3/xml_server3.cgi?ean_upc=' .
-                urlencode($this->getSku()) . ';lang=' . $this->getLanguage() .
-                ';output=productxml';
+            $checkurls[] = $prefix .
+                '?prod_id=' . urlencode($this->getSku()) .
+                ';vendor=' . $this->getBrand() .
+                $suffix;
         }
         $this->setUrls($checkurls);
     }
@@ -188,8 +187,28 @@ abstract class FetcherBase implements FetcherInterface
             ]);
 
             if ($response->getStatusCode() == 200) {
-                $this->setBaseData($response->getBody()->getContents());
-                break;
+                $xml = simplexml_load_string($response->getBody()->getContents());
+                if (isset($xml->Product['ErrorMessage'])) {
+                    $errorCode = $xml->Product['Code']->__toString();
+                    $errorMessage = $xml->Product['ErrorMessage']->__toString();
+                    $this->setError(
+                        $errorMessage,
+                        $errorCode
+                    );
+
+                    // If error is one of those, we should stop
+                    $fatalErrors = [
+                        'The requested XML data-sheet is not present in the Icecat database.',
+                        'Access to this product and language is restricted',
+                    ];
+                    // If code is -1 we can stop.
+                    if (in_array($errorMessage, $fatalErrors)) {
+                        break;
+                    }
+                } else {
+                    $this->setBaseData($xml);
+                    break;
+                }
             } else {
                 $this->setError($response->getReasonPhrase(), $response->getStatusCode());
             }

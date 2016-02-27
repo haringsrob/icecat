@@ -42,8 +42,6 @@ $data = $fetcher->getBaseData();
 // Initialize.
 $icecat = new Result($data);
 
-// Get data from the object.
-
 // Brand name. e.g.: Acer
 $icecat->getSupplier();
 
