@@ -2,14 +2,14 @@
 
 namespace haringsrob\Icecat\Model;
 
-class Icecat implements IcecatInterface
+class Result implements ResultInterface
 {
     /**
      * The actual data we fetched. To get the data you can use @see haringsrob\Icecat\Controller\IcecatFetcher
      *
      * @var object
      */
-    public $icecat_data;
+    public $data;
 
 
     /**
@@ -21,7 +21,7 @@ class Icecat implements IcecatInterface
      */
     public function __construct($data)
     {
-        $this->icecat_data = $data;
+        $this->data = $data;
     }
 
     /**
@@ -29,7 +29,7 @@ class Icecat implements IcecatInterface
      */
     public function setBaseData($data)
     {
-        $this->icecat_data = $data;
+        $this->data = $data;
     }
 
     /**
@@ -37,11 +37,11 @@ class Icecat implements IcecatInterface
      */
     public function getBaseData()
     {
-        return $this->icecat_data;
+        return $this->data;
     }
 
     /**
-     * Returns all attributes.
+     * Gets all attributes.
      */
     public function getAttributes()
     {
@@ -49,9 +49,10 @@ class Icecat implements IcecatInterface
     }
 
     /**
-     * Returns a specific attribute.
+     * Gets a specific attribute.
      *
      * @param string $attribute
+     *
      * @return string
      */
     public function getAttribute($attribute)
@@ -60,7 +61,7 @@ class Icecat implements IcecatInterface
     }
 
     /**
-     * Returns the supplier.
+     * Gets the supplier.
      *
      * @return string
      */
@@ -70,7 +71,7 @@ class Icecat implements IcecatInterface
     }
 
     /**
-     * Returns product long description.
+     * Gets the long description.
      *
      * @return string
      */
@@ -83,7 +84,7 @@ class Icecat implements IcecatInterface
     }
 
     /**
-     * Returns product short description.
+     * Gets the short description.
      *
      * @return string
      */
@@ -106,7 +107,7 @@ class Icecat implements IcecatInterface
     }
 
     /**
-     * Returns an array of images.
+     * Gets an array of images.
      *
      * @return array
      */
@@ -151,7 +152,7 @@ class Icecat implements IcecatInterface
     }
 
     /**
-     * Returns an array of specifications.
+     * Gets an array of specifications.
      *
      * @return array
      */
@@ -177,7 +178,7 @@ class Icecat implements IcecatInterface
     }
 
     /**
-     * Returns all product data.
+     * Gets all product data.
      *
      * @return object
      */

@@ -5,7 +5,7 @@ namespace haringsrob\Icecat\Model;
 /**
  * Interface for icecat data object.
  */
-interface IcecatInterface
+interface ResultInterface
 {
     /**
      * Set the base data that other methods will use..
@@ -15,7 +15,7 @@ interface IcecatInterface
     public function setBaseData($xml);
 
     /**
-     * Returns the base data object.
+     * Get the base data object.
      *
      * @return SimpleXML-Object $xml
      */

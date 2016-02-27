@@ -5,45 +5,45 @@ namespace haringsrob\Icecat\Model;
 /**
  * Interface for icecat data object.
  */
-interface IcecatFetcherInterface extends IcecatInterface
+interface FetcherInterface
 {
     /**
-     * Returns the url to use for getting data.
+     * Gets the url to use for getting data.
      *
      * @return string
      */
     public function getServerAddress();
 
     /**
-     * Constructs a list of possible data sheet urls.
+     * Generate a list of possible data sheet urls.
      *
      * @return array
      */
     public function generateUrls();
 
     /**
-     * Returns the Username required to connect with Icecat.
+     * Gets the Username required to connect with Icecat.
      *
      * @return string
      */
     public function getUsername();
 
     /**
-     * Returns the Password required to connect with Icecat.
+     * Gets the Password required to connect with Icecat.
      *
      * @return string
      */
     public function getPassword();
 
     /**
-     * Returns the Language required to connect with Icecat.
+     * Gets the Language required to connect with Icecat.
      *
      * @return string
      */
     public function getLanguage();
 
     /**
-     * Returns the defined EAN code.
+     * Gets the defined EAN code.
      *
      * @return string
      */

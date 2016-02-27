@@ -3,53 +3,53 @@
 namespace haringsrob\Icecat\Model;
 
 /**
- * Class IcecatFetcherBase
+ * Class FetcherBase
  *
  * This the base class for IcecatFetcher, providing the minimum required logic.
  */
-abstract class IcecatFetcherBase implements IcecatFetcherInterface
+abstract class FetcherBase implements FetcherInterface
 {
     /**
      * The ean number of the product.
      *
      * @var integer
      */
-    public $ean;
+    protected $ean;
 
     /**
      * The Language of the data we would like to get.
      *
      * @var string
      */
-    public $language;
+    protected $language;
 
     /**
      * Errors we have gotten.
      *
      * @var array
      */
-    public $errors = array();
+    protected $errors = array();
 
     /**
      * The fetched data object.
      *
      * @var SimpleXML-object
      */
-    public $icecat_data;
+    protected $icecat_data;
 
     /**
      * The list of urls we can parse.
      *
      * @var array
      */
-    public $data_urls = array();
+    protected $dataUrls = array();
 
     /**
      * The address of the server to fetch data from.
      *
      * @var string
      */
-    public $serveradres = 'http://data.icecat.biz/xml_s3/xml_server3.cgi';
+    protected $serveradres = 'http://data.icecat.biz/xml_s3/xml_server3.cgi';
 
     /**
      * @inheritdoc.
@@ -92,6 +92,26 @@ abstract class IcecatFetcherBase implements IcecatFetcherInterface
     }
 
     /**
+     * Gets the brand
+     *
+     * @return brand
+     */
+    public function getBrand()
+    {
+        return $this->brand;
+    }
+
+    /**
+     * Gets the sku.
+     *
+     * @return string
+     */
+    public function getSku()
+    {
+        return $this->sku;
+    }
+
+    /**
      * Constructs a list of possible url's to fetch data from.
      *
      * @return array
@@ -129,7 +149,7 @@ abstract class IcecatFetcherBase implements IcecatFetcherInterface
      */
     public function setUrls($urls)
     {
-        $this->data_urls = $urls;
+        $this->dataUrls = $urls;
     }
 
     /**
@@ -139,10 +159,10 @@ abstract class IcecatFetcherBase implements IcecatFetcherInterface
      */
     public function getUrls()
     {
-        if (empty($this->data_urls)) {
+        if (empty($this->dataUrls)) {
             $this->generateUrls();
         }
-        return $this->data_urls;
+        return $this->dataUrls;
     }
 
 

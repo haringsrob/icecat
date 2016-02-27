@@ -2,28 +2,28 @@
 
 namespace haringsrob\Icecat\Model;
 
-use haringsrob\Icecat\Model\Icecat;
+use haringsrob\Icecat\Model\Result;
 
 /**
- * Class IcecatFetcher
+ * Class Fetcher
  *
  * This class acts as a communication helper to fetch data from icecat.
  */
-class IcecatFetcher extends IcecatFetcherBase
+class Fetcher extends FetcherBase
 {
     /**
      * The sku (product number) of the product.
      *
      * @var string
      */
-    public $sku;
+    protected $sku;
 
     /**
      * The brand of the product.
      *
      * @var string
      */
-    public $brand;
+    protected $brand;
 
     /**
      * The icecat username.
@@ -92,7 +92,7 @@ class IcecatFetcher extends IcecatFetcherBase
     }
 
     /**
-     * Returns if there were any errors.
+     * Gets errors if there are any.
      *
      * @return array|bool
      */

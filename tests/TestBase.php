@@ -2,12 +2,12 @@
 
 namespace haringsrob\Icecat\Tests;
 
-use haringsrob\Icecat\Model\Icecat;
+use haringsrob\Icecat\Model\Result;
 
 /**
  * The base test class, which creates testable dummy content.
  */
-abstract class IcecatTestBase extends \PHPUnit_Framework_TestCase
+abstract class TestBase extends \PHPUnit_Framework_TestCase
 {
     /**
      * Example icecat data.

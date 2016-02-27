@@ -16,8 +16,7 @@ There is a list of [Icecat sponsor brands](http://icecat.co.uk/en/menu/partners/
 Installation
 ============
 
-The library can be installed in various ways. You could manually integrate it but the easiest way to get started is 
-through composer, adding the following to your project required would be enough.
+The library can be installed using composer:
 
 ```
 "haringsrob/icecat": "dev-master"

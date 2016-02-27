@@ -2,13 +2,13 @@
 
 namespace haringsrob\Icecat\Tests;
 
-use haringsrob\Icecat\Tests\IcecatTestBase;
-use haringsrob\Icecat\Model\Icecat;
+use haringsrob\Icecat\Tests\TestBase;
+use haringsrob\Icecat\Model\Result;
 
 /**
- * @coversDefaultClass \haringsrob\Icecat\Model\Icecat
+ * @coversDefaultClass \haringsrob\Icecat\Model\Result
  */
-class IcecatTests extends IcecatTestBase
+class ResultTest extends TestBase
 {
     /**
      * @covers: ::__constructor
@@ -29,7 +29,7 @@ class IcecatTests extends IcecatTestBase
      */
     public function testIcecat()
     {
-        $icecat = new Icecat($this->getSampleData());
+        $icecat = new Result($this->getSampleData());
 
         // Simulates the getBaseData.
         $icecat->setBaseData($this->getSampleData());
