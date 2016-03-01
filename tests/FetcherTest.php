@@ -72,7 +72,7 @@ class FetcherTests extends TestBase
         // Set the language.
         $icecat->setLanguage('EN');
         $this->assertEquals('EN', $icecat->getLanguage());
-        
+
         // Tests generateUrls.
         $urls = $icecat->getUrls();
         // First should contain the EAN.

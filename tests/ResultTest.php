@@ -35,7 +35,7 @@ class ResultTest extends TestBase
         $icecat->setBaseData($this->getSampleData());
 
         // getBaseData.
-        $this->assertEquals($this->getSampleData(), $icecat->getBaseData());
+        $this->assertEquals(json_decode(json_encode($this->getSampleData())), $icecat->getBaseData());
 
         // Get the attributes.
         $info_title = $icecat->getAttribute('Title');

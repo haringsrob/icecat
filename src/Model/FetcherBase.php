@@ -37,7 +37,7 @@ abstract class FetcherBase implements FetcherInterface
      *
      * @var SimpleXML-object
      */
-    protected $icecat_data;
+    protected $result;
 
     /**
      * The list of urls we can parse.
@@ -220,15 +220,15 @@ abstract class FetcherBase implements FetcherInterface
      */
     public function getBaseData()
     {
-        return $this->icecat_data;
+        return $this->result;
     }
 
     /**
-     * @inheritdoc
+     * The json string to set as data.
      */
-    public function setBaseData($xml)
+    public function setBaseData($json)
     {
-        $this->icecat_data = $xml;
+        $this->result = $json;
     }
 
     /**

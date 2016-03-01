@@ -7,7 +7,7 @@ class Result implements ResultInterface
     /**
      * The actual data we fetched. To get the data you can use @see haringsrob\Icecat\Controller\IcecatFetcher
      *
-     * @var object
+     * @var json
      */
     public $data;
 
@@ -17,11 +17,11 @@ class Result implements ResultInterface
      *
      * @todo: validation.
      *
-     * @param SimpleXML-object $data
+     * @param Json $data
      */
     public function __construct($data)
     {
-        $this->data = $data;
+        $this->data = json_decode(json_encode($data));
     }
 
     /**
@@ -29,7 +29,7 @@ class Result implements ResultInterface
      */
     public function setBaseData($data)
     {
-        $this->data = $data;
+        $this->data = json_decode(json_encode($data));
     }
 
     /**
@@ -45,7 +45,7 @@ class Result implements ResultInterface
      */
     public function getAttributes()
     {
-        return $this->getProductData()->attributes();
+        return $this->getProductData()->{"@attributes"};
     }
 
     /**
@@ -57,7 +57,7 @@ class Result implements ResultInterface
      */
     public function getAttribute($attribute)
     {
-        return $this->getAttributes()->$attribute->__toString();
+        return $this->getAttributes()->$attribute;
     }
 
     /**
@@ -67,7 +67,7 @@ class Result implements ResultInterface
      */
     public function getSupplier()
     {
-        return $this->getProductData()->Supplier->attributes()->Name->__toString();
+        return $this->getProductData()->Supplier->{"@attributes"}->Name;
     }
 
     /**
@@ -77,10 +77,7 @@ class Result implements ResultInterface
      */
     public function getLongDescription()
     {
-        if (is_object($this->getProductData()->ProductDescription->attributes()->LongDesc)) {
-            return $this->getProductData()->ProductDescription->attributes()->LongDesc->__toString();
-        }
-        return $this->getShortDescription();
+        return $this->getProductData()->ProductDescription->{"@attributes"}->LongDesc;
     }
 
     /**
@@ -90,10 +87,7 @@ class Result implements ResultInterface
      */
     public function getShortDescription()
     {
-        if (is_object($this->getProductData()->ProductDescription->attributes()->ShortDesc)) {
-            return $this->getProductData()->ProductDescription->attributes()->ShortDesc->__toString();
-        }
-        return false;
+        return $this->getProductData()->ProductDescription->{"@attributes"}->ShortDesc;
     }
 
     /**
@@ -103,7 +97,7 @@ class Result implements ResultInterface
      */
     public function getCategory()
     {
-        return $this->getProductData()->Category->Name->attributes()->Value->__toString();
+        return $this->getProductData()->Category->Name->{"@attributes"}->Value;
     }
 
     /**
@@ -126,10 +120,10 @@ class Result implements ResultInterface
         if (!empty($this->getProductData()->ProductGallery)) {
             foreach ($this->getProductData()->ProductGallery->ProductPicture as $img) {
 
-                $attr = $img->attributes();
-                $images[$imgcount - 1]['high'] = $attr->Pic->__toString();
-                $images[$imgcount - 1]['low'] = $attr->LowPic->__toString();
-                $images[$imgcount - 1]['thumb'] = $attr->ThumbPic->__toString();
+                $attr = $img->{"@attributes"};
+                $images[$imgcount - 1]['high'] = $attr->Pic;
+                $images[$imgcount - 1]['low'] = $attr->LowPic;
+                $images[$imgcount - 1]['thumb'] = $attr->ThumbPic;
 
                 // If we got all data. Stop.
                 if ($imgcount == $limit && $limit !== 0) {
@@ -141,10 +135,10 @@ class Result implements ResultInterface
             }
         } else {
             // So our base did not have images. Lets try and fetch the main image.
-            if (!empty($this->getProductData()->attributes()->HighPic)) {
-                $images[$imgcount - 1]['high'] = $this->getProductData()->attributes()->HighPic->__toString();
-                $images[$imgcount - 1]['low'] = $this->getProductData()->attributes()->LowPic->__toString();
-                $images[$imgcount - 1]['thumb'] = $this->getProductData()->attributes()->ThumbPic->__toString();
+            if (!empty($this->getProductData()->{"@attributes"}->HighPic)) {
+                $images[$imgcount - 1]['high'] = $this->getProductData()->{"@attributes"}->HighPic;
+                $images[$imgcount - 1]['low'] = $this->getProductData()->{"@attributes"}->LowPic;
+                $images[$imgcount - 1]['thumb'] = $this->getProductData()->{"@attributes"}->ThumbPic;
             }
         }
 
@@ -167,8 +161,8 @@ class Result implements ResultInterface
 
         // Loop our data.
         foreach ($this->getProductData()->ProductFeature as $feature) {
-            $spec[$speccount]['name'] = $feature->Feature->Name->attributes()->Value->__toString();
-            $spec[$speccount]['data'] = $feature->attributes()->Presentation_Value->__toString();
+            $spec[$speccount]['name'] = $feature->Feature->Name->{"@attributes"}->Value;
+            $spec[$speccount]['data'] = $feature->{"@attributes"}->Presentation_Value;
 
             // Count up.
             $speccount++;
@@ -184,6 +178,6 @@ class Result implements ResultInterface
      */
     public function getProductData()
     {
-        return $this->getBaseData()->Product;
+        return $this->data->Product;
     }
 }
