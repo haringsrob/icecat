@@ -1,6 +1,7 @@
 Icecat
 ======
 [![Build Status](https://travis-ci.org/haringsrob/icecat.svg?branch=master)](https://travis-ci.org/haringsrob/icecat)
+[![Code Climate](https://codeclimate.com/github/haringsrob/icecat/badges/gpa.svg)](https://codeclimate.com/github/haringsrob/icecat)
 
 Icecat is a PHP library, that assists you in the following 2 procedures:
 * Fetching data from the Icecat database using basic product information.
