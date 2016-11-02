@@ -5,12 +5,11 @@ namespace haringsrob\Icecat\Model;
 class Result implements ResultInterface
 {
     /**
-     * The actual data we fetched. To get the data you can use @see haringsrob\Icecat\Controller\IcecatFetcher
+     * The actual data we fetched. To get the data you can use.
      *
      * @var json
      */
     public $data;
-
 
     /**
      * Icecat Constructor.
@@ -21,7 +20,7 @@ class Result implements ResultInterface
      */
     public function __construct($data)
     {
-        $this->data = json_decode(json_encode($data));
+        $this->setBaseData($data);
     }
 
     /**
@@ -107,9 +106,8 @@ class Result implements ResultInterface
      */
     public function getImages($limit = 0)
     {
-
         // Init our list.
-        $images = array();
+        $images = [];
 
         // We also count. For our limit.
         $imgcount = 1;
@@ -146,26 +144,39 @@ class Result implements ResultInterface
     }
 
     /**
+     * Gets a specification by its identifier.
+     *
+     * @param integer $identifier
+     *   The ID of the specification.
+     *
+     * @return mixed
+     *   The content of the specification.
+     */
+    public function getSpec($identifier)
+    {
+        foreach ($this->getProductData()->ProductFeature as $feature) {
+            if ($feature->{'@attributes'}->CategoryFeature_ID == $identifier) {
+                return $feature->{"@attributes"}->Presentation_Value;
+            }
+        }
+        return NULL;
+    }
+
+    /**
      * Gets an array of specifications.
      *
      * @return array
      */
     public function getSpecs()
     {
-
         // Init our list.
-        $specs = array();
-
-        // Gotta count here to.
-        $speccount = 0;
+        $spec = [];
 
         // Loop our data.
-        foreach ($this->getProductData()->ProductFeature as $feature) {
-            $spec[$speccount]['name'] = $feature->Feature->Name->{"@attributes"}->Value;
-            $spec[$speccount]['data'] = $feature->{"@attributes"}->Presentation_Value;
-
-            // Count up.
-            $speccount++;
+        foreach ($this->getProductData()->ProductFeature as $key => $feature) {
+            $spec[$key]['name'] = $feature->Feature->Name->{"@attributes"}->Value;
+            $spec[$key]['data'] = $feature->{"@attributes"}->Presentation_Value;
+            $spec[$key]['spec_id'] = $feature->{"@attributes"}->CategoryFeature_ID;
         }
 
         return $spec;
