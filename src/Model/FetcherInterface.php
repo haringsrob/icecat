@@ -52,16 +52,7 @@ interface FetcherInterface
     /**
      * Fetches and builds a SimpleXml Object from the response.
      *
-     * @return SimpleXml Object
+     * @return \SimpleXMLElement
      */
     public function fetchBaseData();
-
-    /**
-     * Sets error messages.
-     *
-     * @param string $message
-     * @param string $code
-     * @param string $type
-     */
-    public function setError($message, $code, $type);
 }

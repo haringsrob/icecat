@@ -2,59 +2,16 @@
 
 namespace haringsrob\Icecat\Model;
 
-use haringsrob\Icecat\Model\Result;
-
 /**
- * Class Fetcher
- *
- * This class acts as a communication helper to fetch data from icecat.
+ * Fetches data from Icecat by parsing the xml.
  */
 class Fetcher extends FetcherBase
 {
-    /**
-     * The sku (product number) of the product.
-     *
-     * @var string
-     */
-    protected $sku;
-
-    /**
-     * The brand of the product.
-     *
-     * @var string
-     */
-    protected $brand;
-
-    /**
-     * The icecat username.
-     *
-     * @var string
-     */
-    protected $username;
-
-    /**
-     * The plain text password.
-     * @var string
-     */
-    protected $password;
-
-    /**
-     * IcecatFetcher constructor.
-     * @param $username
-     * @param $password
-     * @param $ean
-     * @param $language
-     */
-    public function __construct($username, $password, $ean, $language)
-    {
-        $this->username = $username;
-        $this->password = $password;
-        $this->ean = $ean;
-        $this->language = $language;
-    }
 
     /**
      * Sets the language to download data in.
+     *
+     * @param string $language
      */
     public function setLanguage($language)
     {
@@ -64,7 +21,7 @@ class Fetcher extends FetcherBase
     /**
      * Sets the product ean.
      *
-     * @param $ean
+     * @param string $ean
      */
     public function setEan($ean)
     {
@@ -74,7 +31,7 @@ class Fetcher extends FetcherBase
     /**
      * Sets the product sku.
      *
-     * @param $sku
+     * @param string $sku
      */
     public function setSku($sku)
     {
@@ -84,23 +41,10 @@ class Fetcher extends FetcherBase
     /**
      * Sets the product brand.
      *
-     * @param $brand
+     * @param string $brand
      */
     public function setBrand($brand)
     {
         $this->brand = $brand;
-    }
-
-    /**
-     * Gets errors if there are any.
-     *
-     * @return array|bool
-     */
-    public function getErrors()
-    {
-        if (!empty($this->errors)) {
-            return $this->errors;
-        }
-        return false;
     }
 }

@@ -4,6 +4,8 @@ namespace haringsrob\Icecat\Tests;
 
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
+use haringsrob\Icecat\Exceptions\InvalidDataSheetException;
+use haringsrob\Icecat\Exceptions\InvalidResponseException;
 use haringsrob\Icecat\Model\Fetcher;
 
 /**
@@ -25,7 +27,7 @@ class FetcherTest extends TestBase
         $this->fetcher = new Fetcher('Bar', 'Foo', '01234567891987', 'CZ');
     }
 
-    public function testServerAdressGetter()
+    public function testServerAddressGetter()
     {
         $this->assertEquals('https://data.icecat.biz', $this->fetcher->getServerAddress());
     }
@@ -142,7 +144,6 @@ class FetcherTest extends TestBase
         $this->fetcher->setUrls($this->getLocalUrls());
 
         $this->assertEquals($this->fetcher->getUrls(), $this->getLocalUrls());
-        $this->assertFalse($this->fetcher->getErrors());
     }
 
     public function testFetchBaseData()
@@ -158,23 +159,6 @@ class FetcherTest extends TestBase
         $this->assertNotEmpty($this->fetcher->getBaseData());
     }
 
-    public function testFetchBaseDataPageNotFoundError()
-    {
-        $mockHandler = new MockHandler(
-            [
-                new Response('404', [], $this->rawXmlData),
-            ]
-        );
-
-        $this->fetcher->fetchBaseData($mockHandler);
-
-        $this->assertEmpty($this->fetcher->getBaseData());
-
-        $this->assertEquals($this->fetcher->getErrors()[0]['message'], 'Not Found');
-        $this->assertEquals($this->fetcher->getErrors()[0]['type'], 'error');
-        $this->assertEquals($this->fetcher->getErrors()[0]['code'], 404);
-    }
-
     public function testFetchBaseDataAuthenticationError()
     {
         $mockHandler = new MockHandler(
@@ -183,13 +167,9 @@ class FetcherTest extends TestBase
             ]
         );
 
+        $this->setExpectedException(InvalidResponseException::class);
+
         $this->fetcher->fetchBaseData($mockHandler);
-
-        $this->assertEmpty($this->fetcher->getBaseData());
-
-        $this->assertEquals($this->fetcher->getErrors()[0]['message'], 'Unauthorized');
-        $this->assertEquals($this->fetcher->getErrors()[0]['type'], 'error');
-        $this->assertEquals($this->fetcher->getErrors()[0]['code'], 401);
     }
 
     public function testFetchBaseDataDataNotFoundError()
@@ -200,22 +180,8 @@ class FetcherTest extends TestBase
             ]
         );
 
+        $this->setExpectedException(InvalidDataSheetException::class);
+
         $this->fetcher->fetchBaseData($mockHandler);
-
-        $this->assertEmpty($this->fetcher->getBaseData());
-
-        $this->assertEquals(
-            $this->fetcher->getErrors()[0]['message'],
-            'The requested XML data-sheet is not present in the Icecat database.'
-        );
-        $this->assertEquals($this->fetcher->getErrors()[0]['type'], 'error');
-        $this->assertEquals($this->fetcher->getErrors()[0]['code'], -1);
     }
-
-    public function testErrorSetter()
-    {
-        $this->fetcher->setError('Test', 123);
-        $this->assertNotFalse($this->fetcher->getErrors());
-    }
-
 }

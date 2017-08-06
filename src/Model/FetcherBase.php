@@ -4,14 +4,16 @@ namespace haringsrob\Icecat\Model;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Psr7\Response;
+use haringsrob\Icecat\Exceptions\InvalidDataSheetException;
+use haringsrob\Icecat\Exceptions\InvalidResponseException;
 
 /**
- * Class FetcherBase
- *
- * This the base class for IcecatFetcher, providing the minimum required logic.
+ * Minimum requirement to implement in order to fetch data from Icecat.
  */
 abstract class FetcherBase implements FetcherInterface
 {
+
     /**
      * The ean number of the product.
      *
@@ -27,13 +29,6 @@ abstract class FetcherBase implements FetcherInterface
     protected $language;
 
     /**
-     * Errors we have gotten.
-     *
-     * @var array
-     */
-    protected $errors = array();
-
-    /**
      * The fetched data object.
      *
      * @var SimpleXML-object
@@ -45,21 +40,65 @@ abstract class FetcherBase implements FetcherInterface
      *
      * @var array
      */
-    protected $dataUrls = array();
+    protected $dataUrls = [];
 
     /**
      * The address of the server to fetch data from.
      *
      * @var string
      */
-    protected $serveradres = 'https://data.icecat.biz';
+    protected $serverAddress = 'https://data.icecat.biz';
+
+    /**
+     * The sku (product number) of the product.
+     *
+     * @var string
+     */
+    protected $sku;
+
+    /**
+     * The brand of the product.
+     *
+     * @var string
+     */
+    protected $brand;
+
+    /**
+     * The icecat username.
+     *
+     * @var string
+     */
+    protected $username;
+
+    /**
+     * The plain text password.
+     *
+     * @var string
+     */
+    protected $password;
+
+    /**
+     * IcecatFetcher constructor.
+     *
+     * @param $username
+     * @param $password
+     * @param $ean
+     * @param $language
+     */
+    public function __construct($username, $password, $ean, $language)
+    {
+        $this->username = $username;
+        $this->password = $password;
+        $this->ean = $ean;
+        $this->language = $language;
+    }
 
     /**
      * @inheritdoc.
      */
     public function getServerAddress()
     {
-        return $this->serveradres;
+        return $this->serverAddress;
     }
 
     /**
@@ -97,7 +136,7 @@ abstract class FetcherBase implements FetcherInterface
     /**
      * Gets the brand
      *
-     * @return brand
+     * @return string
      */
     public function getBrand()
     {
@@ -116,40 +155,28 @@ abstract class FetcherBase implements FetcherInterface
 
     /**
      * Constructs a list of possible url's to fetch data from.
-     *
-     * @return array
      */
     public function generateUrls()
     {
-        // Init the array to return.
-        $checkurls = [];
+        $urls = [];
 
-        // Get the EAN code.
-        $ean = $this->getEan();
-
-        // Prefix.
         $prefix = $this->getServerAddress() . '/xml_s3/xml_server3.cgi';
         $suffix = ';lang=' . $this->getLanguage() . ';output=productxml;';
 
         // Structure the url. There might be more urls available.
-        if (!empty($ean)) {
-            $checkurls[] =  $prefix .
-                '?ean_upc=' . urlencode($ean) .
-                $suffix;
+        if (!empty($this->ean)) {
+            $urls[] = $prefix . '?ean_upc=' . urlencode($this->getEan()) . $suffix;
         }
-        if (!empty($this->getSku()) && !empty($this->getBrand())) {
-            $checkurls[] = $prefix .
-                '?prod_id=' . urlencode($this->getSku()) .
-                ';vendor=' . $this->getBrand() .
-                $suffix;
+        if (!empty($this->getSku()) && null !== $this->getBrand()) {
+            $urls[] = $prefix . '?prod_id=' . urlencode($this->getSku()) . ';vendor=' . $this->getBrand() . $suffix;
         }
-        $this->setUrls($checkurls);
+        $this->setUrls($urls);
     }
 
     /**
      * Sets the urls which will be used to fetch the data.
      *
-     * @param $urls
+     * @param array $urls
      */
     public function setUrls($urls)
     {
@@ -167,6 +194,7 @@ abstract class FetcherBase implements FetcherInterface
         if (empty($this->dataUrls)) {
             $this->generateUrls();
         }
+
         return $this->dataUrls;
     }
 
@@ -178,46 +206,84 @@ abstract class FetcherBase implements FetcherInterface
      *   Used for testing, the mockHandler is used for emulating web requests.
      *
      * @return void
+     * @throws InvalidDataSheetException
      */
     public function fetchBaseData(MockHandler $handler = null)
     {
         foreach ($this->getUrls() as $url) {
-            $client = new Client(['handler' => $handler]);
-            $response = $client->request('GET', $url, [
-                'verify' => true,
-                'auth' => [
-                    $this->getUsername(),
-                    $this->getPassword(),
+            $icecatRequest = new Client(['handler' => $handler]);
+            $icecatRequestResult = $icecatRequest->request(
+                'GET',
+                $url,
+                [
+                    'verify' => true,
+                    'auth' => [
+                        $this->getUsername(),
+                        $this->getPassword(),
+                    ],
                 ]
-            ]);
+            );
 
-            if ($response->getStatusCode() === 200) {
-                $xml = simplexml_load_string($response->getBody()->getContents());
-                if (isset($xml->Product['ErrorMessage'])) {
-                    $errorCode = $xml->Product['Code']->__toString();
-                    $errorMessage = $xml->Product['ErrorMessage']->__toString();
-                    $this->setError(
-                        $errorMessage,
-                        $errorCode
-                    );
+            if ($this->urlHasValidResponseCode($icecatRequestResult)) {
+                $xml = simplexml_load_string($icecatRequestResult->getBody()->getContents());
 
-                    // If error is one of those, we should stop
-                    $fatalErrors = [
-                        'The requested XML data-sheet is not present in the Icecat database.',
-                        'Access to this product and language is restricted',
-                    ];
-                    // If code is -1 we can stop.
-                    if (in_array($errorMessage, $fatalErrors, true)) {
-                        break;
-                    }
-                } else {
+                if ($this->icecatXmlHasValidData($xml)) {
                     $this->setBaseData($xml);
                     break;
                 }
-            } else {
-                $this->setError($response->getReasonPhrase(), $response->getStatusCode());
             }
+            $this->handleInvalidRequestError($icecatRequestResult);
         }
+    }
+
+    /**
+     * @param \GuzzleHttp\Psr7\Response $response
+     *
+     * @return bool
+     */
+    private function urlHasValidResponseCode(Response $response)
+    {
+        return $response->getStatusCode() === 200;
+    }
+
+    /**
+     * @param \SimpleXMLElement $xml
+     *
+     * @return bool
+     * @throws InvalidDataSheetException
+     */
+    private function icecatXmlHasValidData(\SimpleXMLElement $xml)
+    {
+        if (isset($xml->Product['ErrorMessage'])) {
+            $this->handleInvalidXmlDataError($xml);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param \SimpleXMLElement $xml
+     *
+     * @throws InvalidDataSheetException
+     */
+    private function handleInvalidXmlDataError(\SimpleXMLElement $xml)
+    {
+        $errorCode = $xml->Product['Code']->__toString();
+        $errorMessage = $xml->Product['ErrorMessage']->__toString();
+
+        throw new InvalidDataSheetException(
+            'Icecat could not get a valid data sheet for this product.',
+            $errorMessage,
+            $errorCode
+        );
+    }
+
+    private function handleInvalidRequestError(Response $icecatRequestResult)
+    {
+        throw new InvalidResponseException(
+            $icecatRequestResult->getReasonPhrase(),
+            $icecatRequestResult->getStatusCode()
+        );
     }
 
     /**
@@ -230,21 +296,11 @@ abstract class FetcherBase implements FetcherInterface
 
     /**
      * The json string to set as data.
+     *
+     * @param string $json
      */
     public function setBaseData($json)
     {
         $this->result = $json;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setError($message, $code, $type = 'error')
-    {
-        $this->errors[] = [
-            'message' => $message,
-            'type' => $type,
-            'code' => $code,
-        ];
     }
 }
