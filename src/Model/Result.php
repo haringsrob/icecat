@@ -2,6 +2,9 @@
 
 namespace haringsrob\Icecat\Model;
 
+/**
+ * Parses the result data into a usable object.
+ */
 class Result implements ResultInterface
 {
 
