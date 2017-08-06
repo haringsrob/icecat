@@ -3,6 +3,7 @@
 namespace haringsrob\Icecat\Model;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
 
 /**
  * Class FetcherBase
@@ -158,7 +159,8 @@ abstract class FetcherBase implements FetcherInterface
     /**
      * Returns the available urls.
      *
-     * @param $urls
+     * @return array
+     *   The array containing the possible fetching urls.
      */
     public function getUrls()
     {
@@ -172,12 +174,15 @@ abstract class FetcherBase implements FetcherInterface
     /**
      * Connects with the server and reads out the data.
      *
-     * @return SimpleXML Object|bool
+     * @param \GuzzleHttp\Handler\MockHandler|null $handler
+     *   Used for testing, the mockHandler is used for emulating web requests.
+     *
+     * @return void
      */
-    public function fetchBaseData()
+    public function fetchBaseData(MockHandler $handler = null)
     {
         foreach ($this->getUrls() as $url) {
-            $client = new Client();
+            $client = new Client(['handler' => $handler]);
             $response = $client->request('GET', $url, [
                 'verify' => true,
                 'auth' => [
@@ -186,7 +191,7 @@ abstract class FetcherBase implements FetcherInterface
                 ]
             ]);
 
-            if ($response->getStatusCode() == 200) {
+            if ($response->getStatusCode() === 200) {
                 $xml = simplexml_load_string($response->getBody()->getContents());
                 if (isset($xml->Product['ErrorMessage'])) {
                     $errorCode = $xml->Product['Code']->__toString();
@@ -202,7 +207,7 @@ abstract class FetcherBase implements FetcherInterface
                         'Access to this product and language is restricted',
                     ];
                     // If code is -1 we can stop.
-                    if (in_array($errorMessage, $fatalErrors)) {
+                    if (in_array($errorMessage, $fatalErrors, true)) {
                         break;
                     }
                 } else {

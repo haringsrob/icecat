@@ -4,19 +4,27 @@ namespace haringsrob\Icecat\Model;
 
 class Result implements ResultInterface
 {
+
     /**
      * The actual data we fetched. To get the data you can use.
      *
-     * @var json
+     * @var \stdClass
      */
-    public $data;
+    private $data;
+
+    /**
+     * The images as an array.
+     *
+     * @var array
+     */
+    private $images = [];
 
     /**
      * Icecat Constructor.
      *
      * @todo: validation.
      *
-     * @param Json $data
+     * @param \SimpleXMLElement $data
      */
     public function __construct($data)
     {
@@ -26,7 +34,7 @@ class Result implements ResultInterface
     /**
      * @inheritdoc
      */
-    public function setBaseData($data)
+    private function setBaseData($data)
     {
         $this->data = json_decode(json_encode($data));
     }
@@ -44,7 +52,7 @@ class Result implements ResultInterface
      */
     public function getAttributes()
     {
-        return $this->getProductData()->{"@attributes"};
+        return $this->getProductData()->{'@attributes'};
     }
 
     /**
@@ -66,7 +74,7 @@ class Result implements ResultInterface
      */
     public function getSupplier()
     {
-        return $this->getProductData()->Supplier->{"@attributes"}->Name;
+        return $this->getProductData()->Supplier->{'@attributes'}->Name;
     }
 
     /**
@@ -76,7 +84,7 @@ class Result implements ResultInterface
      */
     public function getLongDescription()
     {
-        return $this->getProductData()->ProductDescription->{"@attributes"}->LongDesc;
+        return $this->getProductData()->ProductDescription->{'@attributes'}->LongDesc;
     }
 
     /**
@@ -86,7 +94,7 @@ class Result implements ResultInterface
      */
     public function getShortDescription()
     {
-        return $this->getProductData()->ProductDescription->{"@attributes"}->ShortDesc;
+        return $this->getProductData()->ProductDescription->{'@attributes'}->ShortDesc;
     }
 
     /**
@@ -96,7 +104,7 @@ class Result implements ResultInterface
      */
     public function getCategory()
     {
-        return $this->getProductData()->Category->Name->{"@attributes"}->Value;
+        return $this->getProductData()->Category->Name->{'@attributes'}->Value;
     }
 
     /**
@@ -104,43 +112,40 @@ class Result implements ResultInterface
      *
      * @return array
      */
-    public function getImages($limit = 0)
+    public function getImages()
     {
-        // Init our list.
-        $images = [];
-
-        // We also count. For our limit.
-        $imgcount = 1;
-
-        // Loop our data.
-        // Here we check if the gallery is available.
-        // If not we just take the main image only.
-        if (!empty($this->getProductData()->ProductGallery)) {
-            foreach ($this->getProductData()->ProductGallery->ProductPicture as $img) {
-
-                $attr = $img->{"@attributes"};
-                $images[$imgcount - 1]['high'] = $attr->Pic;
-                $images[$imgcount - 1]['low'] = $attr->LowPic;
-                $images[$imgcount - 1]['thumb'] = $attr->ThumbPic;
-
-                // If we got all data. Stop.
-                if ($imgcount == $limit && $limit !== 0) {
-                    break;
+        if (empty($this->images)) {
+            if ($this->productHasImageGallery()) {
+                foreach ($this->getProductData()->ProductGallery->ProductPicture as $img) {
+                    $attr = $img->{'@attributes'};
+                    $this->images[]['high'] = $attr->Pic;
+                    $this->images[]['low'] = $attr->LowPic;
+                    $this->images[]['thumb'] = $attr->ThumbPic;
                 }
-
-                // Count up.
-                $imgcount++;
             }
-        } else {
-            // So our base did not have images. Lets try and fetch the main image.
-            if (!empty($this->getProductData()->{"@attributes"}->HighPic)) {
-                $images[$imgcount - 1]['high'] = $this->getProductData()->{"@attributes"}->HighPic;
-                $images[$imgcount - 1]['low'] = $this->getProductData()->{"@attributes"}->LowPic;
-                $images[$imgcount - 1]['thumb'] = $this->getProductData()->{"@attributes"}->ThumbPic;
+            if ($this->productHasMainImage()) {
+                $this->images[]['high'] = $this->getProductData()->{'@attributes'}->HighPic;
+                $this->images[]['low'] = $this->getProductData()->{'@attributes'}->LowPic;
+                $this->images[]['thumb'] = $this->getProductData()->{'@attributes'}->ThumbPic;
             }
         }
 
-        return $images;
+        return $this->images;
+    }
+
+    /**
+     * Checks if the product has an image gallery.
+     *
+     * @return bool
+     */
+    private function productHasImageGallery()
+    {
+        return !empty($this->getProductData()->ProductGallery);
+    }
+
+    private function productHasMainImage()
+    {
+        return !empty($this->getProductData()->{'@attributes'}->HighPic);
     }
 
     /**
@@ -152,14 +157,32 @@ class Result implements ResultInterface
      * @return mixed
      *   The content of the specification.
      */
-    public function getSpec($identifier)
+    public function getSpecByIdentifier($identifier)
     {
         foreach ($this->getProductData()->ProductFeature as $feature) {
-            if ($feature->{'@attributes'}->CategoryFeature_ID == $identifier) {
-                return $feature->{"@attributes"}->Presentation_Value;
+            if ($feature->{'@attributes'}->CategoryFeature_ID === $identifier) {
+                return $feature->{'@attributes'}->Presentation_Value;
             }
         }
-        return NULL;
+        return null;
+    }
+
+    /**
+     * Gets a specification by name.
+     *
+     * @param string $specificationName
+     *
+     * @return mixed
+     *   The content of the specification.
+     */
+    public function getSpecByName($specificationName)
+    {
+        foreach ($this->getProductData()->ProductFeature as $feature) {
+            if (strtolower($feature->Feature->Name->{'@attributes'}->Value) === strtolower($specificationName)) {
+                return $feature->{'@attributes'}->Presentation_Value;
+            }
+        }
+        return null;
     }
 
     /**
@@ -169,26 +192,25 @@ class Result implements ResultInterface
      */
     public function getSpecs()
     {
-        // Init our list.
-        $spec = [];
+        $specifications = [];
 
-        // Loop our data.
         foreach ($this->getProductData()->ProductFeature as $key => $feature) {
-            $spec[$key]['name'] = $feature->Feature->Name->{"@attributes"}->Value;
-            $spec[$key]['data'] = $feature->{"@attributes"}->Presentation_Value;
-            $spec[$key]['spec_id'] = $feature->{"@attributes"}->CategoryFeature_ID;
+            $specifications[$key]['name'] = $feature->Feature->Name->{'@attributes'}->Value;
+            $specifications[$key]['data'] = $feature->{'@attributes'}->Presentation_Value;
+            $specifications[$key]['spec_id'] = $feature->{'@attributes'}->CategoryFeature_ID;
         }
 
-        return $spec;
+        return $specifications;
     }
 
     /**
      * Gets all product data.
      *
-     * @return object
+     * @return \stdClass
      */
     public function getProductData()
     {
         return $this->data->Product;
     }
+
 }

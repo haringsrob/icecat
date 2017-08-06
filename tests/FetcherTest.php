@@ -2,110 +2,220 @@
 
 namespace haringsrob\Icecat\Tests;
 
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Psr7\Response;
 use haringsrob\Icecat\Model\Fetcher;
-use haringsrob\Icecat\Model\FetcherBase;
-use haringsrob\Icecat\Model\FetcherInterface;
 
 /**
  * @coversDefaultClass \haringsrob\Icecat\Model\Fetcher
  */
-class FetcherTests extends TestBase
+class FetcherTest extends TestBase
 {
+
     /**
-     * Tests the config methods of the icecatFetcher class.
+     * The fetcher object.
      *
-     * @covers ::__construct
-     * @covers ::getServerAddress
-     * @covers ::getUsername
-     * @covers ::getPassword
-     * @covers ::getLanguage
-     * @covers ::getEan
-     * @covers ::generateUrls
-     * @covers ::setEan
-     * @covers ::setBrand
-     * @covers ::setSku
-     * @covers ::setLanguage
-     * @covers ::getBaseData
-     * @covers ::setBaseData
-     * @covers ::setUrls
-     * @covers ::getUrls
-     * @covers ::fetchBaseData
-     * @covers ::setError
-     * @covers ::getErrors
+     * @var Fetcher
      */
-    public function testFetcherConfig()
+    private $fetcher;
+
+    public function setUp()
     {
-        $icecat = new Fetcher(
-            'Bar',
-            'Foo',
-            '01234567891987',
-            'CZ'
+        parent::setUp();
+        $this->fetcher = new Fetcher('Bar', 'Foo', '01234567891987', 'CZ');
+    }
+
+    public function testServerAdressGetter()
+    {
+        $this->assertEquals('https://data.icecat.biz', $this->fetcher->getServerAddress());
+    }
+
+    public function testUsernameGetter()
+    {
+        $this->assertEquals('Bar', $this->fetcher->getUsername());
+    }
+
+    public function testPasswordGetter()
+    {
+        $this->assertEquals('Foo', $this->fetcher->getPassword());
+    }
+
+    public function testLanguageGetter()
+    {
+        $this->assertEquals('CZ', $this->fetcher->getLanguage());
+    }
+
+    public function testEanGetter()
+    {
+        $this->assertEquals('01234567891987', $this->fetcher->getEan());
+    }
+
+    public function testEanSetter()
+    {
+        $this->fetcher->setEan('0887899773884');
+        $this->assertEquals('0887899773884', $this->fetcher->getEan());
+    }
+
+    public function testBrandSetter()
+    {
+        $this->fetcher->setBrand('Acer');
+        $this->assertEquals('Acer', $this->fetcher->getBrand());
+    }
+
+    public function testSkuSetter()
+    {
+        $this->fetcher->setSku('NX.EF2AA.001');
+        $this->assertEquals('NX.EF2AA.001', $this->fetcher->getSku());
+    }
+
+    public function testLanguageSetter()
+    {
+        $this->fetcher->setLanguage('EN');
+        $this->assertEquals('EN', $this->fetcher->getLanguage());
+    }
+
+    public function testGetUrlsWithoutBrandAndSku()
+    {
+        $urls = $this->fetcher->getUrls();
+        $this->assertEquals(
+            'https://data.icecat.biz/xml_s3/xml_server3.cgi?ean_upc=01234567891987;lang=CZ;output=productxml;',
+            $urls[0]
+        );
+        $this->assertArrayNotHasKey(1, $urls);
+        $this->assertArrayNotHasKey(2, $urls);
+    }
+
+    public function testGetUrlsWithoutBrand()
+    {
+        $this->fetcher->setSku('NX.EF2AA.001');
+
+        $urls = $this->fetcher->getUrls();
+        $this->assertEquals(
+            'https://data.icecat.biz/xml_s3/xml_server3.cgi?ean_upc=01234567891987;lang=CZ;output=productxml;',
+            $urls[0]
+        );
+        $this->assertArrayNotHasKey(1, $urls);
+        $this->assertArrayNotHasKey(2, $urls);
+    }
+
+    public function testGetUrlsWithoutSku()
+    {
+        $this->fetcher->setBrand('Brand');
+
+        $urls = $this->fetcher->getUrls();
+        $this->assertEquals(
+            'https://data.icecat.biz/xml_s3/xml_server3.cgi?ean_upc=01234567891987;lang=CZ;output=productxml;',
+            $urls[0]
+        );
+        $this->assertArrayNotHasKey(1, $urls);
+        $this->assertArrayNotHasKey(2, $urls);
+    }
+
+    public function testGetUrlsWithBrandAndSku()
+    {
+        $this->fetcher->setSku('NX.EF2AA.001');
+        $this->fetcher->setBrand('Brand');
+
+        $urls = $this->fetcher->getUrls();
+
+        $this->assertContains(
+            'https://data.icecat.biz/xml_s3/xml_server3.cgi?ean_upc=01234567891987;lang=CZ;output=productxml;',
+            $urls[0]
         );
 
-        // Tests the serverAddress.
-        $this->assertEquals('https://data.icecat.biz', $icecat->getServerAddress());
-
-        // Tests the username.
-        $this->assertEquals('Bar', $icecat->getUsername());
-
-        // Tests the password.
-        $this->assertEquals('Foo', $icecat->getPassword());
-
-        // Tests the password.
-        $this->assertEquals('CZ', $icecat->getLanguage());
-
-        // Test the ean.
-        $this->assertEquals('01234567891987', $icecat->getEan());
-
-        // Set the EAN code.
-        $icecat->setEan('0887899773884');
-        $this->assertEquals('0887899773884', $icecat->getEan());
-
-        // Set the Brand?
-        $icecat->setBrand('Acer');
-        $this->assertEquals('Acer', $icecat->getBrand());
-
-        // Set the SKU.
-        $icecat->setSku('NX.EF2AA.001');
-        $this->assertEquals('NX.EF2AA.001', $icecat->getSku());
-
-        // Set the language.
-        $icecat->setLanguage('EN');
-        $this->assertEquals('EN', $icecat->getLanguage());
-
-        // Tests generateUrls.
-        $urls = $icecat->getUrls();
-        // First should contain the EAN.
-        $this->assertContains($icecat->getEan(), $urls[0]);
-        // Second one the brand and sku.
-        $this->assertContains($icecat->getBrand(), $urls[1]);
-        $this->assertContains($icecat->getSku(), $urls[1]);
-
-        // Test generateURLS without Ean.
-        $icecat->setUrls([]);
-        $icecat->setEan(null);
-
-        $urls = $icecat->getUrls();
-        $this->assertContains($icecat->getSku(), $urls[0]);
-
-        // Set base data.
-        $icecat->setBaseData($this->getSampleData());
-
-        // Check equals.
-        $this->assertEquals($icecat->getBaseData(), $this->getSampleData());
-
-        // Attempt to get the data, but this should fail.
-        // Emulate the remote url to a local one.
-        $icecat->setUrls($this->getLocalUrls());
-
-        // Test get urls.
-        $this->assertEquals($icecat->getUrls(), $this->getLocalUrls());
-
-        // And as we have errors, we can check the hasErrors here.
-        $this->assertFalse($icecat->getErrors());
-
-        // Tests setError().
-        $icecat->setError('Test', 123);
-        $this->assertNotFalse($icecat->getErrors());
+        $this->assertContains(
+        /** @codingStandardsIgnoreLine */
+            'https://data.icecat.biz/xml_s3/xml_server3.cgi?prod_id=NX.EF2AA.001;vendor=Brand;lang=CZ;output=productxml;',
+            $urls[1]
+        );
     }
+
+    public function testSetBaseData()
+    {
+        $this->fetcher->setBaseData($this->getSampleData());
+        $this->assertEquals($this->fetcher->getBaseData(), $this->getSampleData());
+    }
+
+    public function testSetUrlToLocal()
+    {
+        // Emulate the remote url to a local one.
+        $this->fetcher->setUrls($this->getLocalUrls());
+
+        $this->assertEquals($this->fetcher->getUrls(), $this->getLocalUrls());
+        $this->assertFalse($this->fetcher->getErrors());
+    }
+
+    public function testFetchBaseData()
+    {
+        $mockHandler = new MockHandler(
+            [
+                new Response('200', [], $this->rawXmlData),
+            ]
+        );
+
+        $this->fetcher->fetchBaseData($mockHandler);
+
+        $this->assertNotEmpty($this->fetcher->getBaseData());
+    }
+
+    public function testFetchBaseDataPageNotFoundError()
+    {
+        $mockHandler = new MockHandler(
+            [
+                new Response('404', [], $this->rawXmlData),
+            ]
+        );
+
+        $this->fetcher->fetchBaseData($mockHandler);
+
+        $this->assertEmpty($this->fetcher->getBaseData());
+
+        $this->assertEquals($this->fetcher->getErrors()[0]['message'], 'Not Found');
+        $this->assertEquals($this->fetcher->getErrors()[0]['type'], 'error');
+        $this->assertEquals($this->fetcher->getErrors()[0]['code'], 404);
+    }
+
+    public function testFetchBaseDataAuthenticationError()
+    {
+        $mockHandler = new MockHandler(
+            [
+                new Response('401', [], $this->rawXmlData),
+            ]
+        );
+
+        $this->fetcher->fetchBaseData($mockHandler);
+
+        $this->assertEmpty($this->fetcher->getBaseData());
+
+        $this->assertEquals($this->fetcher->getErrors()[0]['message'], 'Unauthorized');
+        $this->assertEquals($this->fetcher->getErrors()[0]['type'], 'error');
+        $this->assertEquals($this->fetcher->getErrors()[0]['code'], 401);
+    }
+
+    public function testFetchBaseDataDataNotFoundError()
+    {
+        $mockHandler = new MockHandler(
+            [
+                new Response('200', [], $this->rawNotFoundXml),
+            ]
+        );
+
+        $this->fetcher->fetchBaseData($mockHandler);
+
+        $this->assertEmpty($this->fetcher->getBaseData());
+
+        $this->assertEquals(
+            $this->fetcher->getErrors()[0]['message'],
+            'The requested XML data-sheet is not present in the Icecat database.'
+        );
+        $this->assertEquals($this->fetcher->getErrors()[0]['type'], 'error');
+        $this->assertEquals($this->fetcher->getErrors()[0]['code'], -1);
+    }
+
+    public function testErrorSetter()
+    {
+        $this->fetcher->setError('Test', 123);
+        $this->assertNotFalse($this->fetcher->getErrors());
+    }
+
 }

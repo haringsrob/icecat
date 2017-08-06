@@ -10,65 +10,89 @@ use haringsrob\Icecat\Model\Result;
  */
 class ResultTest extends TestBase
 {
+
     /**
-     * @covers: ::__constructor
-     * @covers: ::setBaseData
-     * @covers: ::getBaseData
-     * @covers: ::setProductEan
-     * @covers: ::setProductBrand
-     * @covers: ::setProductSku
-     * @covers: ::setLanguage
-     * @covers: ::generateUrls
-     * @covers: ::getAttribute
-     * @covers: ::getSupplier
-     * @covers: ::getLongDescription
-     * @covers: ::getShortDescription
-     * @covers: ::getCategory
-     * @covers: ::getImages
-     * @covers: ::getSpecs
+     * The icecat result object.
+     *
+     * @var Result
      */
-    public function testIcecat()
+    private $icecatResult;
+
+    public function setUp()
     {
-        $icecat = new Result($this->getSampleData());
-
-        // Simulates the getBaseData.
-        $icecat->setBaseData($this->getSampleData());
-
-        // getBaseData.
-        $this->assertEquals(json_decode(json_encode($this->getSampleData())), $icecat->getBaseData());
-
-        // Get the attributes.
-        $info_title = $icecat->getAttribute('Title');
-        $this->assertEquals('Acer Chromebook C740-C3P1', $info_title);
-
-        // Test the supplier.
-        $info_supplier = $icecat->getSupplier();
-        $this->assertEquals('Acer', $info_supplier);
-
-        // Test description fields.
-        $short_description = $icecat->getShortDescription();
-        $this->assertContains('Intel Celeron 3205U 1.50 GHz, 2 GB DDR3L SDRAM', $short_description);
-
-        $long_description = $icecat->getLongDescription();
-        $this->assertContains('Engineered to be strong', $long_description);
-
-        // Test category.
-        $info_category = $icecat->getCategory();
-        $this->assertEquals('notebooks', $info_category);
-
-        // Test images.
-        $images = $icecat->getImages();
-        $this->assertTrue(count($images) > 0);
-
-        // Check if we actually get an image url.
-        $this->assertEquals('http://images.icecat.biz/img/norm/high/26057953-3839.jpg', $images[0]['high']);
-
-        // Test specifications.
-        $specifications = $icecat->getSpecs();
-        $this->assertTrue(count($specifications) > 0);
-
-        // Check if we actually hava specifications data.
-        $this->assertEquals($specifications[0]['name'], 'Product type');
-        $this->assertEquals($specifications[0]['data'], 'Chromebook');
+        parent::setUp();
+        $this->icecatResult = new Result($this->getSampleData());
     }
+
+    public function testGetBaseData()
+    {
+        $this->assertEquals(json_decode(json_encode($this->getSampleData())), $this->icecatResult->getBaseData());
+    }
+
+    public function testAttributeGetter()
+    {
+        $this->assertEquals('Acer Chromebook C740-C3P1', $this->icecatResult->getAttribute('Title'));
+    }
+
+    public function testSupplierGetter()
+    {
+        $this->assertEquals('Acer', $this->icecatResult->getSupplier());
+    }
+
+    public function testShortDescriptionGetter()
+    {
+        $this->assertContains(
+            'Intel Celeron 3205U 1.50 GHz, 2 GB DDR3L SDRAM',
+            $this->icecatResult->getShortDescription()
+        );
+    }
+
+    public function testLongDescriptionGetter()
+    {
+        $this->assertContains('Engineered to be strong', $this->icecatResult->getLongDescription());
+    }
+
+    public function testCategoryGetter()
+    {
+        $this->assertEquals('notebooks', $this->icecatResult->getCategory());
+    }
+
+    public function testImagesGetter()
+    {
+        $this->assertTrue(count($this->icecatResult->getImages()) > 0);
+        $this->assertEquals(
+            'http://images.icecat.biz/img/norm/high/26057953-3839.jpg',
+            $this->icecatResult->getImages()[0]['high']
+        );
+    }
+
+    public function testAllSpecificationGetter()
+    {
+        $productSpecifications = $this->icecatResult->getSpecs();
+
+        $this->assertTrue(count($productSpecifications) > 0);
+        $this->assertEquals($productSpecifications[0]['name'], 'Product type');
+        $this->assertEquals($productSpecifications[0]['data'], 'Chromebook');
+    }
+
+    public function testSpecificationGetterById()
+    {
+        $this->assertEquals($this->icecatResult->getSpecByIdentifier('101037'), 'Chromebook');
+    }
+
+    public function testSpecificationGetterByName()
+    {
+        $this->assertEquals($this->icecatResult->getSpecByName('product type'), 'Chromebook');
+    }
+
+    public function testInvalidSpecificationGetterById()
+    {
+        $this->assertNull($this->icecatResult->getSpecByIdentifier('00'));
+    }
+
+    public function testInvalidSpecificationGetterByName()
+    {
+        $this->assertNull($this->icecatResult->getSpecByName('invalid'));
+    }
+
 }

@@ -2,17 +2,16 @@
 
 namespace haringsrob\Icecat\Tests;
 
-use haringsrob\Icecat\Model\Result;
-
 /**
  * The base test class, which creates testable dummy content.
  */
 abstract class TestBase extends \PHPUnit_Framework_TestCase
 {
+
     /**
      * Example icecat data.
      *
-     * @var SimpleXML Object
+     * @var \SimpleXMLElement
      */
     private $xml;
 
@@ -24,14 +23,37 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
     private $test_path;
 
     /**
+     * A raw string representation of the sample data.
+     *
+     * @var string
+     */
+    public $rawXmlData;
+
+    /**
+     * A raw string representation of the not found xml data.
+     *
+     * @var string
+     */
+    public $rawNotFoundXml;
+
+    /**
      * @inheritdoc.
      */
     public function setUp()
     {
         parent::setUp();
-        // Load our dummy content.
-        $this->test_path = dirname(__FILE__);
-        $this->xml = simplexml_load_string(file_get_contents($this->test_path . '/DummyData/product.xml'));
+        $this->test_path = __DIR__;
+        $this->initializeDummyData();
+    }
+
+    /**
+     * Initializes dummy data.
+     */
+    private function initializeDummyData()
+    {
+        $this->rawNotFoundXml = file_get_contents($this->test_path . '/DummyData/productNotFound.xml');
+        $this->rawXmlData = file_get_contents($this->test_path . '/DummyData/product.xml');
+        $this->xml = simplexml_load_string($this->rawXmlData);
     }
 
     /**
@@ -47,7 +69,7 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
     /**
      * Provides testable example data.
      *
-     * @return SimpleXML Object
+     * @return \SimpleXMLElement
      */
     public function getSampleData()
     {
