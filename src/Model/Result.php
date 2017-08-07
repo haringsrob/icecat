@@ -2,6 +2,9 @@
 
 namespace haringsrob\Icecat\Model;
 
+use haringsrob\Icecat\Entities\Specification;
+use haringsrob\Icecat\Exceptions\SpecificationNotFoundException;
+
 /**
  * Parses the result data into a usable object.
  */
@@ -157,17 +160,22 @@ class Result implements ResultInterface
      * @param integer $identifier
      *   The ID of the specification.
      *
-     * @return mixed
+     * @return Specification
+     *
+     * @throws \haringsrob\Icecat\Exceptions\SpecificationNotFoundException
      *   The content of the specification.
      */
     public function getSpecByIdentifier($identifier)
     {
         foreach ($this->getProductData()->ProductFeature as $feature) {
-            if ($feature->{'@attributes'}->CategoryFeature_ID === $identifier) {
-                return $feature->{'@attributes'}->Presentation_Value;
+            if ((int) $feature->{'@attributes'}->CategoryFeature_ID === $identifier) {
+                return new Specification($feature);
+                //$feature->{'@attributes'}->Presentation_Value;
             }
         }
-        return null;
+        throw new SpecificationNotFoundException(
+            sprintf('The specification with identifier %d was not found.', $identifier)
+        );
     }
 
     /**
@@ -175,17 +183,21 @@ class Result implements ResultInterface
      *
      * @param string $specificationName
      *
-     * @return mixed
+     * @return Specification
+     *
+     * @throws \haringsrob\Icecat\Exceptions\SpecificationNotFoundException
      *   The content of the specification.
      */
     public function getSpecByName($specificationName)
     {
         foreach ($this->getProductData()->ProductFeature as $feature) {
             if (strtolower($feature->Feature->Name->{'@attributes'}->Value) === strtolower($specificationName)) {
-                return $feature->{'@attributes'}->Presentation_Value;
+                return new Specification($feature);
             }
         }
-        return null;
+        throw new SpecificationNotFoundException(
+            sprintf('The specification with name %s was not found.', $specificationName)
+        );
     }
 
     /**

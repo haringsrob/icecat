@@ -2,6 +2,7 @@
 
 namespace haringsrob\Icecat\Tests;
 
+use haringsrob\Icecat\Exceptions\SpecificationNotFoundException;
 use haringsrob\Icecat\Tests\TestBase;
 use haringsrob\Icecat\Model\Result;
 
@@ -77,22 +78,29 @@ class ResultTest extends TestBase
 
     public function testSpecificationGetterById()
     {
-        $this->assertEquals($this->icecatResult->getSpecByIdentifier('101037'), 'Chromebook');
-    }
-
-    public function testSpecificationGetterByName()
-    {
-        $this->assertEquals($this->icecatResult->getSpecByName('product type'), 'Chromebook');
+        $this->assertEquals($this->icecatResult->getSpecByIdentifier(101037)->getValue(), 'Chromebook');
     }
 
     public function testInvalidSpecificationGetterById()
     {
-        $this->assertNull($this->icecatResult->getSpecByIdentifier('00'));
+        $this->setExpectedException(SpecificationNotFoundException::class);
+        $this->icecatResult->getSpecByIdentifier('00');
+    }
+
+    public function testSpecificationGetterByName()
+    {
+        $this->assertEquals($this->icecatResult->getSpecByName('product type')->getValue(), 'Chromebook');
     }
 
     public function testInvalidSpecificationGetterByName()
     {
-        $this->assertNull($this->icecatResult->getSpecByName('invalid'));
+        $this->setExpectedException(SpecificationNotFoundException::class);
+        $this->icecatResult->getSpecByName('invalid');
+    }
+
+    public function testSpecificationWithCdata()
+    {
+        $this->assertEquals($this->icecatResult->getSpecByIdentifier(134988)->getSignValue(), 'MHz');
     }
 
 }
