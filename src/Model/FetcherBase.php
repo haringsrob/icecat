@@ -225,7 +225,7 @@ abstract class FetcherBase implements FetcherInterface
             );
 
             if ($this->urlHasValidResponseCode($icecatRequestResult)) {
-                $xml = simplexml_load_string($icecatRequestResult->getBody()->getContents());
+                $xml = simplexml_load_string($icecatRequestResult->getBody()->getContents(), 'SimpleXMLElement', LIBXML_NOCDATA);
 
                 if ($this->icecatXmlHasValidData($xml)) {
                     $this->setBaseData($xml);
