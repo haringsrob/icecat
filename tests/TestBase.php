@@ -53,7 +53,7 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
     {
         $this->rawNotFoundXml = file_get_contents($this->test_path . '/DummyData/productNotFound.xml');
         $this->rawXmlData = file_get_contents($this->test_path . '/DummyData/product.xml');
-        $this->xml = simplexml_load_string($this->rawXmlData);
+        $this->xml = simplexml_load_string($this->rawXmlData, 'SimpleXMLElement', LIBXML_NOCDATA);
     }
 
     /**
