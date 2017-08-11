@@ -17,14 +17,27 @@ class Specification
         $this->rawSpecificationData = $rawSpecificationData;
     }
 
-    public function getSignValue()
+    public function getPresentationValue()
     {
-        return $this->rawSpecificationData->LocalValue->Measure->Signs->Sign;
+        return $this->rawSpecificationData->{'@attributes'}->Presentation_Value;
     }
 
     public function getValue()
     {
-        return $this->rawSpecificationData->{'@attributes'}->Presentation_Value;
+        return $this->rawSpecificationData->{'@attributes'}->Value;
+    }
+
+    public function getSignValue()
+    {
+        if (!empty($this->rawSpecificationData->LocalValue->Measure->Signs->Sign)) {
+            return $this->rawSpecificationData->LocalValue->Measure->Signs->Sign;
+        }
+        return null;
+    }
+
+    public function getName()
+    {
+        return $this->rawSpecificationData->Feature->Name->{'@attributes'}->Value;
     }
 
 }

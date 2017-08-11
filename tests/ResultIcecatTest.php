@@ -3,13 +3,12 @@
 namespace haringsrob\Icecat\Tests;
 
 use haringsrob\Icecat\Exceptions\SpecificationNotFoundException;
-use haringsrob\Icecat\Tests\TestBase;
 use haringsrob\Icecat\Model\Result;
 
 /**
  * @coversDefaultClass \haringsrob\Icecat\Model\Result
  */
-class ResultTest extends TestBase
+class ResultIcecatTest extends IcecatTestBase
 {
 
     /**
@@ -96,11 +95,6 @@ class ResultTest extends TestBase
     {
         $this->setExpectedException(SpecificationNotFoundException::class);
         $this->icecatResult->getSpecByName('invalid');
-    }
-
-    public function testSpecificationWithCdata()
-    {
-        $this->assertEquals($this->icecatResult->getSpecByIdentifier(134988)->getSignValue(), 'MHz');
     }
 
 }
