@@ -2,6 +2,7 @@ Icecat
 ======
 [![Build Status](https://travis-ci.org/haringsrob/icecat.svg?branch=master)](https://travis-ci.org/haringsrob/icecat)
 [![Code Climate](https://codeclimate.com/github/haringsrob/icecat/badges/gpa.svg)](https://codeclimate.com/github/haringsrob/icecat)
+[![codecov](https://codecov.io/gh/haringsrob/icecat/branch/master/graph/badge.svg)](https://codecov.io/gh/haringsrob/icecat)
 
 Icecat is a PHP library, that assists you in the following 2 procedures:
 * Fetching data from the Icecat database using basic product information.
@@ -25,8 +26,6 @@ The library can be installed using composer:
 
 Usage
 =====
-
-The class library is, in it's current state easy to be used.
 
 ### Result
 
@@ -61,8 +60,6 @@ $icecat->getImages(5);
 // Returns key => value array with specifications. e.g: ['cpu' => 'Core I5', 'screensize' => '15.6']
 $icecat->getSpecs();
 ```
-
-Demo is soon available.
 
 ### Fetcher
 

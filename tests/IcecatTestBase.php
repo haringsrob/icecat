@@ -5,7 +5,7 @@ namespace haringsrob\Icecat\Tests;
 /**
  * The base test class, which creates testable dummy content.
  */
-abstract class TestBase extends \PHPUnit_Framework_TestCase
+abstract class IcecatTestBase extends \PHPUnit_Framework_TestCase
 {
 
     /**

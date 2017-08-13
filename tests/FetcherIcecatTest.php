@@ -11,7 +11,7 @@ use haringsrob\Icecat\Model\Fetcher;
 /**
  * @coversDefaultClass \haringsrob\Icecat\Model\Fetcher
  */
-class FetcherTest extends TestBase
+class FetcherIcecatTest extends IcecatTestBase
 {
 
     /**
