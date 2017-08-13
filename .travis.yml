@@ -12,4 +12,7 @@ install:
   - composer install
 
 script:
-  - ./vendor/bin/phpunit -c ./phpunit.xml --coverage-text --strict --verbose
+  - ./vendor/bin/phpunit -c ./phpunit.xml --coverage-text --strict --verbose --coverage-clover=coverage.xml
+
+after_success:
+    - bash <(curl -s https://codecov.io/bash)
