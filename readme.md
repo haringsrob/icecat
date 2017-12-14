@@ -87,4 +87,4 @@ $data = $fetcher->fetchBaseData();
 Integrations
 ============
 
-[Drupal module](https://www.drupal.org/sandbox/tortelduif/2669832, "Icecat Drupal") under active development.
+[Drupal module](https://www.drupal.org/project/icecat, "Icecat Drupal") under active development.
