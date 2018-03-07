@@ -126,9 +126,10 @@ class Result implements ResultInterface
                 }
 
                 foreach ($productPictures as $img) {
-                    $this->images[]['high'] = $img->Pic;
-                    $this->images[]['low'] = $img->LowPic;
-                    $this->images[]['thumb'] = $img->ThumbPic;
+                    $attr = $img->{'@attributes'};
+                    $this->images[]['high'] = $attr->Pic;
+                    $this->images[]['low'] = $attr->LowPic;
+                    $this->images[]['thumb'] = $attr->ThumbPic;
                 }
             }
             if ($this->productHasMainImage()) {
