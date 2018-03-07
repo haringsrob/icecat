@@ -173,7 +173,13 @@ class Result implements ResultInterface
     public function getSpecByIdentifier($identifier)
     {
         if ($this->productHasProductFeature()) {
-            foreach ($this->getProductData()->ProductFeature as $feature) {
+            $productFeature = $this->getProductData()->ProductFeature;
+            
+            // Make sure $productFeature is an array
+            if (!is_array($productFeature)) {
+                $productFeature = [$productFeature];
+            }
+            foreach ($productFeature as $key => $feature) {
                 if ($feature->{'@attributes'}->CategoryFeature_ID === $identifier) {
                     return $feature->{'@attributes'}->Presentation_Value;
                 }
@@ -193,7 +199,13 @@ class Result implements ResultInterface
     public function getSpecByName($specificationName)
     {
         if ($this->productHasProductFeature()) {
-            foreach ($this->getProductData()->ProductFeature as $feature) {
+            $productFeature = $this->getProductData()->ProductFeature;
+            
+            // Make sure $productFeature is an array
+            if (!is_array($productFeature)) {
+                $productFeature = [$productFeature];
+            }
+            foreach ($productFeature as $key => $feature) {
                 if (strtolower($feature->Feature->Name->{'@attributes'}->Value) === strtolower($specificationName)) {
                     return $feature->{'@attributes'}->Presentation_Value;
                 }
@@ -212,7 +224,13 @@ class Result implements ResultInterface
         $specifications = [];
         
         if ($this->productHasProductFeature()) {
-            foreach ($this->getProductData()->ProductFeature as $key => $feature) {
+            $productFeature = $this->getProductData()->ProductFeature;
+            
+            // Make sure $productFeature is an array
+            if (!is_array($productFeature)) {
+                $productFeature = [$productFeature];
+            }
+            foreach ($productFeature as $key => $feature) {
                 $specifications[$key]['name'] = $feature->Feature->Name->{'@attributes'}->Value;
                 $specifications[$key]['data'] = $feature->{'@attributes'}->Presentation_Value;
                 $specifications[$key]['spec_id'] = $feature->{'@attributes'}->CategoryFeature_ID;
