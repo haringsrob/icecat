@@ -81,7 +81,8 @@ $fetcher = new Fetcher(
 );
 
 // Fetch the actual data.
-$data = $fetcher->fetchBaseData();
+$fetcher->fetchBaseData();
+$data = $fetcher->getBaseData();
 ```
 
 Integrations
