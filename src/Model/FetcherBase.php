@@ -229,7 +229,7 @@ abstract class FetcherBase implements FetcherInterface
 
                 if ($this->icecatXmlHasValidData($xml)) {
                     $this->setBaseData($xml);
-                    return this->getBaseData();
+                    return $this->getBaseData();
                 }
             }
             $this->handleInvalidRequestError($icecatRequestResult);
