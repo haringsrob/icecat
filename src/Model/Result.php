@@ -150,6 +150,16 @@ class Result implements ResultInterface
     {
         return !empty($this->getProductData()->{'@attributes'}->HighPic);
     }
+    
+    /**
+     * Checks if the product has Product Features.
+     *
+     * @return bool
+     */
+    private function productHasProductFeature()
+    {
+        return !empty($this->getProductData()->ProductFeature);
+    }
 
     /**
      * Gets a specification by its identifier.
@@ -162,9 +172,11 @@ class Result implements ResultInterface
      */
     public function getSpecByIdentifier($identifier)
     {
-        foreach ($this->getProductData()->ProductFeature as $feature) {
-            if ($feature->{'@attributes'}->CategoryFeature_ID === $identifier) {
-                return $feature->{'@attributes'}->Presentation_Value;
+        if ($this->productHasProductFeature()) {
+            foreach ($this->getProductData()->ProductFeature as $feature) {
+                if ($feature->{'@attributes'}->CategoryFeature_ID === $identifier) {
+                    return $feature->{'@attributes'}->Presentation_Value;
+                }
             }
         }
         return null;
@@ -180,9 +192,11 @@ class Result implements ResultInterface
      */
     public function getSpecByName($specificationName)
     {
-        foreach ($this->getProductData()->ProductFeature as $feature) {
-            if (strtolower($feature->Feature->Name->{'@attributes'}->Value) === strtolower($specificationName)) {
-                return $feature->{'@attributes'}->Presentation_Value;
+        if ($this->productHasProductFeature()) {
+            foreach ($this->getProductData()->ProductFeature as $feature) {
+                if (strtolower($feature->Feature->Name->{'@attributes'}->Value) === strtolower($specificationName)) {
+                    return $feature->{'@attributes'}->Presentation_Value;
+                }
             }
         }
         return null;
@@ -196,11 +210,13 @@ class Result implements ResultInterface
     public function getSpecs()
     {
         $specifications = [];
-
-        foreach ($this->getProductData()->ProductFeature as $key => $feature) {
-            $specifications[$key]['name'] = $feature->Feature->Name->{'@attributes'}->Value;
-            $specifications[$key]['data'] = $feature->{'@attributes'}->Presentation_Value;
-            $specifications[$key]['spec_id'] = $feature->{'@attributes'}->CategoryFeature_ID;
+        
+        if ($this->productHasProductFeature()) {
+            foreach ($this->getProductData()->ProductFeature as $key => $feature) {
+                $specifications[$key]['name'] = $feature->Feature->Name->{'@attributes'}->Value;
+                $specifications[$key]['data'] = $feature->{'@attributes'}->Presentation_Value;
+                $specifications[$key]['spec_id'] = $feature->{'@attributes'}->CategoryFeature_ID;
+            }
         }
 
         return $specifications;
