@@ -119,7 +119,13 @@ class Result implements ResultInterface
     {
         if (empty($this->images)) {
             if ($this->productHasImageGallery()) {
-                foreach ($this->getProductData()->ProductGallery->ProductPicture as $img) {
+                $productPictures = $this->getProductData()->ProductGallery->ProductPicture;
+                // Make sure $productPictures is an array
+                if (!is_array($productPictures)){
+                        $productPictures = [$productPictures];
+                }
+
+                foreach ($productPictures as $img) {
                     $this->images[]['high'] = $img->Pic;
                     $this->images[]['low'] = $img->LowPic;
                     $this->images[]['thumb'] = $img->ThumbPic;
