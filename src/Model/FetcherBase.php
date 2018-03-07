@@ -205,7 +205,7 @@ abstract class FetcherBase implements FetcherInterface
      * @param \GuzzleHttp\Handler\MockHandler|null $handler
      *   Used for testing, the mockHandler is used for emulating web requests.
      *
-     * @return void
+     * @return SimpleXML-Object
      * @throws InvalidDataSheetException
      */
     public function fetchBaseData(MockHandler $handler = null)
@@ -229,7 +229,7 @@ abstract class FetcherBase implements FetcherInterface
 
                 if ($this->icecatXmlHasValidData($xml)) {
                     $this->setBaseData($xml);
-                    break;
+                    return this->getBaseData();
                 }
             }
             $this->handleInvalidRequestError($icecatRequestResult);
