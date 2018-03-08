@@ -175,7 +175,7 @@ class Result implements ResultInterface
         if ($this->productHasProductFeature()) {
             $productFeature = $this->getProductData()->ProductFeature;
             
-            // Make sure $productFeature is an array
+            // Make sure $productFeature is an array.
             if (!is_array($productFeature)) {
                 $productFeature = [$productFeature];
             }
