@@ -120,7 +120,7 @@ class Result implements ResultInterface
         if (empty($this->images)) {
             if ($this->productHasImageGallery()) {
                 $productPictures = $this->getProductData()->ProductGallery->ProductPicture;
-                // Make sure $productPictures is an array
+                // Make sure $productPictures is an array.
                 if (!is_array($productPictures)){
                         $productPictures = [$productPictures];
                 }
