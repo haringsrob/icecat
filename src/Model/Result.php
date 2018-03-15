@@ -127,15 +127,19 @@ class Result implements ResultInterface
 
                 foreach ($productPictures as $img) {
                     $attr = $img->{'@attributes'};
-                    $this->images[]['high'] = $attr->Pic;
-                    $this->images[]['low'] = $attr->LowPic;
-                    $this->images[]['thumb'] = $attr->ThumbPic;
+                    $this->images[] = [
+                        'high'  => $attr->Pic,
+                        'low'   => $attr->LowPic,
+                        'thumb' => $attr->ThumbPic,
+                    ];
                 }
             }
             if ($this->productHasMainImage()) {
-                $this->images[]['high'] = $this->getProductData()->{'@attributes'}->HighPic;
-                $this->images[]['low'] = $this->getProductData()->{'@attributes'}->LowPic;
-                $this->images[]['thumb'] = $this->getProductData()->{'@attributes'}->ThumbPic;
+                $this->images[] = [
+                    'high'  => $this->getProductData()->{'@attributes'}->HighPic,
+                    'low'   => $this->getProductData()->{'@attributes'}->LowPic,
+                    'thumb' => $this->getProductData()->{'@attributes'}->ThumbPic,
+                ];
             }
         }
 
