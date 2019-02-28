@@ -87,7 +87,11 @@ class Result implements ResultInterface
      */
     public function getLongDescription()
     {
-        return $this->getProductData()->ProductDescription->{'@attributes'}->LongDesc;
+        if (!empty($this->getProductData()->ProductDescription->{'@attributes'})) {
+            return $this->getProductData()->ProductDescription->{'@attributes'}->LongDesc;
+        } else {
+            return '';
+        }
     }
 
     /**
@@ -97,7 +101,11 @@ class Result implements ResultInterface
      */
     public function getShortDescription()
     {
-        return $this->getProductData()->ProductDescription->{'@attributes'}->ShortDesc;
+        if (!empty($this->getProductData()->ProductDescription->{'@attributes'})) {
+            return $this->getProductData()->ProductDescription->{'@attributes'}->ShortDesc;
+        } else {
+            return '';
+        }
     }
 
     /**
