@@ -241,6 +241,7 @@ class Result implements ResultInterface
                 $productFeature = [$productFeature];
             }
             foreach ($productFeature as $key => $feature) {
+                $specifications[$key]['feature_id'] = $feature->Feature->{'@attributes'}->ID;
                 $specifications[$key]['name'] = $feature->Feature->Name->{'@attributes'}->Value;
                 $specifications[$key]['data'] = $feature->{'@attributes'}->Presentation_Value;
                 $specifications[$key]['spec_id'] = $feature->{'@attributes'}->CategoryFeature_ID;
