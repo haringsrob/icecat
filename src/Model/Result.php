@@ -161,7 +161,7 @@ class Result implements ResultInterface
      */
     private function productHasImageGallery()
     {
-        return !empty($this->getProductData()->ProductGallery);
+        return !empty($this->getProductData()->ProductGallery->ProductPicture);
     }
 
     private function productHasMainImage()
