@@ -21,6 +21,13 @@ class Result implements ResultInterface
      * @var array
      */
     private $images = [];
+    
+    /**
+     * The multimedia objects as an array.
+     *
+     * @var array
+     */
+    private $multimediaObjects = [];
 
     /**
      * Icecat Constructor.
@@ -164,9 +171,56 @@ class Result implements ResultInterface
         return !empty($this->getProductData()->ProductGallery->ProductPicture);
     }
 
+    /**
+     * Checks if the product has a Main Image.
+     *
+     * @return bool
+     */
     private function productHasMainImage()
     {
         return !empty($this->getProductData()->{'@attributes'}->HighPic);
+    }
+    
+    /**
+     * Gets an array of images.
+     *
+     * @return array
+     */
+    public function getMultimediaObjects()
+    {
+        if (empty($this->multimediaObjects)) {
+            if ($this->productHasMultimediaObject()) {
+                $productMultimediaObjects = $this->getProductData()->ProductMultimediaObject->MultimediaObject;
+                // Make sure $productMultimediaObjects is an array.
+                if (!is_array($productMultimediaObjects)){
+                        $productMultimediaObjects = [$productMultimediaObjects];
+                }
+
+                foreach ($productMultimediaObjects as $multimediaObject) {
+                    $attr = $multimediaObject->{'@attributes'};
+                    $this->multimediaObjects[] = [
+                        'contentType'  => $attr->ContentType,
+                        'description'  => $attr->Description,
+                        'size'         => $attr->Size,
+                        'type'         => $attr->Type,
+                        'url'          => $attr->URL,
+                        'langId'       => $attr->langid,
+                    ];
+                }
+            }
+        }
+
+        return $this->multimediaObjects;
+    }
+    
+    /**
+     * Checks if the product has multimedia objects.
+     *
+     * @return bool
+     */
+    private function productHasMultimediaObject()
+    {
+        return !empty($this->getProductData()->ProductMultimediaObject->MultimediaObject);
     }
     
     /**
