@@ -182,7 +182,7 @@ class Result implements ResultInterface
     }
     
     /**
-     * Gets an array of images.
+     * Gets an array of multimedia Objects.
      *
      * @return array
      */
@@ -195,22 +195,33 @@ class Result implements ResultInterface
                 if (!is_array($productMultimediaObjects)){
                         $productMultimediaObjects = [$productMultimediaObjects];
                 }
-
-                foreach ($productMultimediaObjects as $multimediaObject) {
-                    $attr = $multimediaObject->{'@attributes'};
-                    $this->multimediaObjects[] = [
+                 foreach ($productMultimediaObjects as $productMultimediaObject) {
+                    $attr = $productMultimediaObject->{'@attributes'};
+                    $multimediaObject = [
                         'contentType'  => $attr->ContentType,
                         'description'  => $attr->Description,
-                        'size'         => $attr->Size,
                         'type'         => $attr->Type,
-                        'url'          => $attr->URL,
+                        'size'         => (!empty($attr->Size) ? $attr->Size : 0),
+                        'url'          => (!empty($attr->URL) ? $attr->URL : ''),
                         'langId'       => $attr->langid,
-                    ];
+                     ];
+
+                    // retrieve 360 images?
+                    if ($attr->Type == '360') {
+                        $images360 = [];
+
+                        foreach ($productMultimediaObject->ImagesList360->Image as $image) {
+                            $attr = $image->{'@attributes'};
+                            $images360[(int) $attr->No] = $attr->Link;
+                        }
+                        $multimediaObject['image360'] = $images360;
+                    }
+
+                    $this->multimediaObjects[] = $$multimediaObject;
                 }
             }
         }
-
-        return $this->multimediaObjects;
+         return $this->multimediaObjects;
     }
     
     /**
