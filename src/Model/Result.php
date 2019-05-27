@@ -189,7 +189,7 @@ class Result implements ResultInterface
      *
      * @return array
      */
-    private function getMultimediaObjects($objectType)
+    public function getMultimediaObjects($objectType = '')
     {
         if (empty($this->multimediaObjects)) {
             if ($this->productHasMultimediaObject()) {
@@ -222,6 +222,11 @@ class Result implements ResultInterface
                 }
             }
         }
+        
+        if (empty($objectType)) {
+            return $this->multimediaObjects;
+        }
+        
         return (isset($this->multimediaObjects[$objectType]) ? $this->multimediaObjects[$objectType] : []);
     }
     
