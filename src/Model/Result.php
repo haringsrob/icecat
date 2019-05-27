@@ -184,8 +184,8 @@ class Result implements ResultInterface
 
     /**
      * Gets an array of multimedia Objects.
-	 *
-	 * @param string $objectType MultimediaObjectType (video/mp4|manual|360|leaflet)
+     *
+     * @param string $objectType MultimediaObjectType (video/mp4|manual|360|leaflet)
      *
      * @return array
      */
@@ -224,36 +224,36 @@ class Result implements ResultInterface
         }
         return (isset($this->multimediaObjects[$objectType]) ? $this->multimediaObjects[$objectType] : []);
     }
-	
-	/**
+    
+    /**
      * Gets an array of 360 images.
-	 *
+     *
      * @return array
      */
-	public function get360imageArray()
-	{
-		return $this->getMultimediaObjects('360');
-	}
-	
-	/**
+    public function get360imageArray()
+    {
+        return $this->getMultimediaObjects('360');
+    }
+    
+    /**
      * Gets an array of manuals.
-	 *
+     *
      * @return array
      */
-	public function getManuals()
-	{
-		return $this->getMultimediaObjects('manual');
-	}
-	
-	/**
+    public function getManuals()
+    {
+        return $this->getMultimediaObjects('manual');
+    }
+    
+    /**
      * Gets an array of videos.
-	 *
+     *
      * @return array
      */
-	public function getVideos()
-	{
-		return $this->getMultimediaObjects('video/mp4');
-	}
+    public function getVideos()
+    {
+        return $this->getMultimediaObjects('video/mp4');
+    }
 
     /**
      * Checks if the product has multimedia objects.
