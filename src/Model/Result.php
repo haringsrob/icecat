@@ -217,7 +217,7 @@ class Result implements ResultInterface
                         $multimediaObject['image360'] = $images360;
                     }
 
-                    $this->multimediaObjects[] = $$multimediaObject;
+                    $this->multimediaObjects[] = $multimediaObject;
                 }
             }
         }
