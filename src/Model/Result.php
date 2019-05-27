@@ -21,13 +21,14 @@ class Result implements ResultInterface
      * @var array
      */
     private $images = [];
-    
+
     /**
      * The multimedia objects as an array.
      *
      * @var array
      */
     private $multimediaObjects = [];
+
 
     /**
      * Icecat Constructor.
@@ -180,13 +181,15 @@ class Result implements ResultInterface
     {
         return !empty($this->getProductData()->{'@attributes'}->HighPic);
     }
-    
+
     /**
      * Gets an array of multimedia Objects.
+	 *
+	 * @param string $objectType MultimediaObjectType (video/mp4|manual|360|leaflet)
      *
      * @return array
      */
-    public function getMultimediaObjects()
+    private function getMultimediaObjects($objectType)
     {
         if (empty($this->multimediaObjects)) {
             if ($this->productHasMultimediaObject()) {
@@ -200,10 +203,8 @@ class Result implements ResultInterface
                     $multimediaObject = [
                         'contentType'  => $attr->ContentType,
                         'description'  => $attr->Description,
-                        'type'         => $attr->Type,
                         'size'         => (!empty($attr->Size) ? $attr->Size : 0),
                         'url'          => (!empty($attr->URL) ? $attr->URL : ''),
-                        'langId'       => $attr->langid,
                      ];
 
                     // retrieve 360 images?
@@ -217,13 +218,43 @@ class Result implements ResultInterface
                         $multimediaObject['image360'] = $images360;
                     }
 
-                    $this->multimediaObjects[] = $multimediaObject;
+                    $this->multimediaObjects[$attr->Type][] = $multimediaObject;
                 }
             }
         }
-         return $this->multimediaObjects;
+        return (isset($this->multimediaObjects[$objectType]) ? $this->multimediaObjects[$objectType] : []);
     }
-    
+	
+	/**
+     * Gets an array of 360 images.
+	 *
+     * @return array
+     */
+	public function get360imageArray()
+	{
+		return $this->getMultimediaObjects('360');
+	}
+	
+	/**
+     * Gets an array of manuals.
+	 *
+     * @return array
+     */
+	public function getManuals()
+	{
+		return $this->getMultimediaObjects('manual');
+	}
+	
+	/**
+     * Gets an array of videos.
+	 *
+     * @return array
+     */
+	public function getVideos()
+	{
+		return $this->getMultimediaObjects('video/mp4');
+	}
+
     /**
      * Checks if the product has multimedia objects.
      *
@@ -233,7 +264,7 @@ class Result implements ResultInterface
     {
         return !empty($this->getProductData()->ProductMultimediaObject->MultimediaObject);
     }
-    
+
     /**
      * Checks if the product has Product Features.
      *
@@ -257,7 +288,7 @@ class Result implements ResultInterface
     {
         if ($this->productHasProductFeature()) {
             $productFeature = $this->getProductData()->ProductFeature;
-            
+
             // Make sure $productFeature is an array.
             if (!is_array($productFeature)) {
                 $productFeature = [$productFeature];
@@ -283,7 +314,7 @@ class Result implements ResultInterface
     {
         if ($this->productHasProductFeature()) {
             $productFeature = $this->getProductData()->ProductFeature;
-            
+
             // Make sure $productFeature is an array.
             if (!is_array($productFeature)) {
                 $productFeature = [$productFeature];
@@ -305,10 +336,10 @@ class Result implements ResultInterface
     public function getSpecs()
     {
         $specifications = [];
-        
+
         if ($this->productHasProductFeature()) {
             $productFeature = $this->getProductData()->ProductFeature;
-            
+
             // Make sure $productFeature is an array.
             if (!is_array($productFeature)) {
                 $productFeature = [$productFeature];
