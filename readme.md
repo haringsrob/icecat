@@ -60,6 +60,17 @@ $icecat->getImages(5);
 
 // Returns key => value array with specifications. e.g: ['cpu' => 'Core I5', 'screensize' => '15.6']
 $icecat->getSpecs();
+
+// Returns array with videos of the product.
+$icecat->getVideos();
+
+// Returns array with manuals.
+$icecat->getManuals();
+
+// Returns array with 360 images.
+$icecat->get360imageArray();
+
+
 ```
 
 Demo is soon available.
