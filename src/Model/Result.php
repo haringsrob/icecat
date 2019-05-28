@@ -212,8 +212,8 @@ class Result implements ResultInterface
                         $images360 = [];
 
                         foreach ($productMultimediaObject->ImagesList360->Image as $image) {
-                            $attr = $image->{'@attributes'};
-                            $images360[(int) $attr->No] = $attr->Link;
+                            $attr360 = $image->{'@attributes'};
+                            $images360[(int) $attr360->No] = $attr360->Link;
                         }
                         $multimediaObject['image360'] = $images360;
                     }
