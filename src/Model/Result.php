@@ -28,6 +28,15 @@ class Result implements ResultInterface
      * @var array
      */
     private $multimediaObjects = [];
+    
+    
+    
+    /**
+     * The ReasonToBuy objects as an array.
+     *
+     * @var array
+     */
+    private $reasonsToBuy = [];
 
 
     /**
