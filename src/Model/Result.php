@@ -294,7 +294,7 @@ class Result implements ResultInterface
                     $productReasonsToBuy = [$productReasonsToBuy];
                 }
                 foreach ($productReasonsToBuy as $productReasonToBuy) {
-                    $attr = $productReasonsToBuy->{'@attributes'};
+                    $attr = $productReasonToBuy->{'@attributes'};
                     $reasonToBuy = [
                         'ID'          => $attr->ID,
                         'value'       => $attr->Value,
