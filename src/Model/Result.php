@@ -323,7 +323,7 @@ class Result implements ResultInterface
      */
     private function productHasReasonsToBuy()
     {
-        return !empty($this->getProductData()->ReasonsToBuy);
+        return !empty($this->getProductData()->ReasonsToBuy->ReasonToBuy);
     }
 
     /**
