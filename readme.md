@@ -70,6 +70,9 @@ $icecat->getManuals();
 // Returns array with 360 images.
 $icecat->get360imageArray();
 
+// Returns array with Reasons to Buy.
+$icecat->getReasonsToBuy();
+
 
 ```
 
