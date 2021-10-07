@@ -28,6 +28,15 @@ class Result implements ResultInterface
      * @var array
      */
     private $multimediaObjects = [];
+    
+    
+    
+    /**
+     * The ReasonToBuy objects as an array.
+     *
+     * @var array
+     */
+    private $reasonsToBuy = [];
 
 
     /**
@@ -229,7 +238,7 @@ class Result implements ResultInterface
         
         return (isset($this->multimediaObjects[$objectType]) ? $this->multimediaObjects[$objectType] : []);
     }
-    
+
     /**
      * Gets an array of 360 images.
      *
@@ -268,6 +277,53 @@ class Result implements ResultInterface
     private function productHasMultimediaObject()
     {
         return !empty($this->getProductData()->ProductMultimediaObject->MultimediaObject);
+    }
+
+    /**
+     * Gets an array of reasons to buy.
+     *
+     * @return array
+     */
+    public function getReasonsToBuy()
+    {
+        if (empty($this->reasonsToBuy)) {
+            if ($this->productHasReasonsToBuy()) {
+                $productReasonsToBuy = $this->getProductData()->ReasonsToBuy->ReasonToBuy;
+                // Make sure $productReasonsToBuy is an array.
+                if (!is_array($productReasonsToBuy)){
+                    $productReasonsToBuy = [$productReasonsToBuy];
+                }
+                foreach ($productReasonsToBuy as $productReasonToBuy) {
+                    $attr = $productReasonToBuy->{'@attributes'};
+                    $reasonToBuy = [
+                        'ID'          => $attr->ID,
+                        'value'       => $attr->Value,
+                        'HighPic'     => $attr->HighPic,
+                        'HighPicSize' => $attr->HighPicSize,
+                        'No'          => $attr->No,
+                        'Title'       => $attr->Title,
+                        'langid'      => $attr->langid,
+                        'origin'      => $attr->origin,
+                        'IsRich'      => $attr->IsRich,
+                    ];
+
+                    $this->reasonsToBuy[] = $reasonToBuy;
+                }
+            }
+        }
+
+        return $this->reasonsToBuy;
+    }
+
+
+    /**
+     * Checks if the product has ReasonToBuy objects.
+     *
+     * @return bool
+     */
+    private function productHasReasonsToBuy()
+    {
+        return !empty($this->getProductData()->ReasonsToBuy->ReasonToBuy);
     }
 
     /**
