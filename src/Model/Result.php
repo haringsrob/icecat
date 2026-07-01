@@ -125,6 +125,37 @@ class Result implements ResultInterface
         }
     }
 
+
+    /**
+     * Gets the long summary description.
+     *
+     * @return string
+     */
+    public function getLongSummaryDescription()
+    {
+        if (!empty($this->getProductData()->SummaryDescription->LongSummaryDescription)) {
+            return $this->getProductData()->SummaryDescription->LongSummaryDescription;
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     * Gets the short summary description.
+     *
+     * @return string
+     */
+    public function getShortSummaryDescription()
+    {
+       if (!empty($this->getProductData()->SummaryDescription->ShortSummaryDescription)) {
+            return $this->getProductData()->SummaryDescription->ShortSummaryDescription;
+        } else {
+            return '';
+        }
+    }
+
+    
+
     /**
      * Gets the product category.
      *
